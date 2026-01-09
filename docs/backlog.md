@@ -208,14 +208,14 @@
 
 | Prioridade | Tarefas | Status |
 |------------|---------|--------|
-| P1 (Crítico) | 5 | ✅ 4/5 |
-| P2 (Importante) | 4 | 🟡 0/4 |
+| P1 (Crítico) | 5 | ✅ 5/5 |
+| P2 (Importante) | 4 | ✅ 2/4 |
 | P3 (Desejável) | 5 | 🟡 0/5 |
-| **TOTAL** | **14** | **4/14 (28.6%)** |
+| **TOTAL** | **14** | **7/14 (50%)** |
 
 ---
 
 ## 🎯 Próxima Tarefa Recomendada
-**P1-005: Integração com Leitor de Código de Barras**
+**P2-004: Exportação para Excel**
 
-Implementar captura de código de barras (QR Code e Barcode) para leitura de números de série dos equipamentos, com fallback para input manual.
+Gerar arquivo Excel com itens que requerem ajuste (estado "active"), incluindo serial, hostname e usuário.
