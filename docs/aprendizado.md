@@ -408,3 +408,27 @@ O componente de Upload salvava o dataframe em `st.session_state.lansweeper_data`
 
 **Correção:**
 Unificado tudo para usar `st.session_state.dataframe`.
+
+---
+
+#### 🚀 Deploy em Streamlit Cloud: ModuleNotFoundError (09/01/2026)
+
+**Contexto:**
+Ao fazer deploy da aplicação no Streamlit Cloud, ocorreu o erro `ModuleNotFoundError: No module named 'app'`.
+
+**Causa:**
+O Streamlit executa o script `app/main.py` diretamente. Se o diretório raiz não estiver no `PYTHONPATH`, o Python não consegue resolver imports absolutos como `from app.config import ...`.
+
+**Solução:**
+Adicionar dinamicamente a raiz do projeto ao `sys.path` no início do `app/main.py`:
+
+```python
+import sys
+import os
+
+# Adiciona diretório pai ao path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+```
+
+**Lição:**
+Sempre garantir que o `sys.path` esteja corretamente configurado para scripts de entrada que são executados a partir de subdiretórios, especialmente em ambientes de nuvem gerenciados.

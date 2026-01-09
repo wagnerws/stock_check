@@ -628,3 +628,20 @@ Implementação de visualização gráfica e métricas agregadas para acompanham
 
 #### Próximos Passos
 1. **P3-002:** Histórico persistente (evitar perda ao recarregar página).
+
+---
+
+## Data: 09/01/2026 - 15:50 BRT
+
+### 16. Correções de Deploy (Streamlit Cloud)
+
+#### Contexto
+Ajustes necessários para que a aplicação rodasse corretamente no ambiente nuvem do Streamlit.
+
+#### Mudanças
+- **ImportError:** Adicionada constante `STATE_EMOJI` faltante em `app/utils/constants.py`.
+- **ModuleNotFoundError:** Adicionado hack de `sys.path` em `app/main.py` para resolver imports absolutos.
+- **Git Push:** Sincronização completa das branches `dev` e `main`.
+
+#### Status
+- ✅ Aplicação pronta para deploy.
