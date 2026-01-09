@@ -23,41 +23,51 @@ def render_comparison_result(result: Dict[str, Any]):
     if not result:
         return
     
-    # Display header with emoji and status
-    st.markdown(f"### {result['status_emoji']} {result['status_message']}")
-    
+    # Determine styles based on status
+    status_color = "gray"
     if result['found']:
-        # Show serial number
-        st.info(f"**Serial:** {result['serialnumber']}")
-        
-        # If equipment requires adjustment, show additional info
         if result['requires_adjustment']:
-            st.warning("⚠️ **Este equipamento requer ajuste no Lansweeper**")
-            
-            # Display hostname and user in columns
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.metric(
-                    label="🖥️ Hostname",
-                    value=result.get('name', 'N/A')
-                )
-            
-            with col2:
-                st.metric(
-                    label="👤 Usuário",
-                    value=result.get('lastuser', 'N/A')
-                )
-            
-            st.markdown("---")
-            st.markdown("📝 **Ação necessária:** Atualizar estado deste equipamento no Lansweeper")
+            status_color = "orange"
         else:
-            # Equipment is OK
-            st.success(f"✅ Estado: **{result['state'].upper()}**")
+            status_color = "green"
     else:
-        # Not found in database
-        st.error("❌ Este serial não foi encontrado na base de dados do Lansweeper")
-        st.info(f"**Serial buscado:** {result['serialnumber']}")
+        status_color = "red"
+        
+    # Main Result Card
+    with st.container(border=True):
+        st.markdown(f"### {result['status_emoji']} {result['status_message']}")
+        
+        # Serial display with large font
+        st.markdown(
+            f"""
+            <div style="text-align: center; margin: 10px 0;">
+                <span style="font-size: 1.2rem; color: gray;">SERIAL NUMBER</span><br>
+                <span style="font-size: 2.5rem; font-weight: bold; font-family: monospace;">{result['serialnumber']}</span>
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+        
+        if result['found']:
+            # Details Section
+            if result['requires_adjustment']:
+                st.warning("⚠️ **AÇÃO NECESSÁRIA:** Baixa Manual no Lansweeper", icon="⚠️")
+                
+                # Context info in columns
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.caption("Hostname")
+                    st.markdown(f"**{result.get('name', 'N/A')}**")
+                with col2:
+                    st.caption("Último Usuário")
+                    st.markdown(f"**{result.get('lastuser', 'N/A')}**")
+            else:
+                # Stock/Good state
+                st.success(f"Equipamento classificado como: **{result['state'].upper()}**", icon="✅")
+        
+        else:
+            # Not found
+            st.error("Serial não cadastrado na base importada.", icon="❌")
 
 
 def render_comparison_component():
@@ -70,44 +80,60 @@ def render_comparison_component():
     - Histórico de verificações em tabela
     - Reset de histórico
     """
-    st.markdown("### 📊 Resultado da Verificação")
+def render_session_metrics():
+    """
+    Renderiza métricas rápidas da sessão de verificação atual.
+    """
+    if 'scanned_items' not in st.session_state or not st.session_state.scanned_items:
+        return
+
+    items = st.session_state.scanned_items
+    total = len(items)
     
-    # 1. Exibir resultado do último scan (destaque)
+    # Count stats
+    total_ok = sum(1 for i in items if i.get('found') and not i.get('requires_adjustment'))
+    total_adj = sum(1 for i in items if i.get('requires_adjustment'))
+    total_err = sum(1 for i in items if not i.get('found'))
+    
+    # Render Metrics
+    m1, m2, m3 = st.columns(3)
+    m1.metric("Total Verificado", total)
+    m2.metric("✅ Em Ordem", total_ok)
+    m3.metric("⚠️ Ajustar (Active)", total_adj, delta_color="inverse")
+    
+    st.divider()
+
+
+def render_comparison_component():
+    """
+    Renderiza componente de comparação de dados.
+    """
+    # 1. Resultados em Tempo Real
     if 'last_scan_result' in st.session_state and st.session_state.last_scan_result:
-        result = st.session_state.last_scan_result
-        
-        # Container visual para o resultado
-        container_color = "green"
-        if result.get('requires_adjustment'):
-             container_color = "orange" # ou yellow
-        elif not result.get('found'):
-             container_color = "red"
-             
-        # Usando st.container com border (Streamlit 1.30+) ou apenas markdown com style
-        with st.container(border=True):
-             render_comparison_result(result)
+        st.markdown("### 🔍 Resultado da Leitura")
+        render_comparison_result(st.session_state.last_scan_result)
 
     # 2. Histórico de Verificações
     if 'scanned_items' in st.session_state and st.session_state.scanned_items:
         st.divider()
-        col_hist_1, col_hist_2 = st.columns([0.8, 0.2])
-        col_hist_1.markdown("#### 🕒 Histórico Recente")
         
-        if col_hist_2.button("Limpar", type="primary"):
+        # Header com botão de limpar
+        col_head, col_btn = st.columns([0.8, 0.2])
+        col_head.markdown("#### 🕒 Histórico da Sessão")
+        
+        if col_btn.button("🗑️ Limpar Sessão", type="secondary", use_container_width=True):
             st.session_state.scanned_items = []
             st.session_state.last_scan_result = None
             st.rerun()
 
-        # Prepara dados para tabela
-        # Precisamos converter a lista de dicts para um formato amigável
+        # Tabela simplificada
         history_data = []
         for item in st.session_state.scanned_items:
             history_data.append({
-                "Hora": item['timestamp'].strftime("%H:%M:%S"),
+                "Timestamp": item['timestamp'], # Keep as datetime for sorting/formatting by column_config
                 "Serial": item['serialnumber'],
-                "Status": item['status_emoji'],
-                "Mensagem": item['status_message'],
-                "Ação": "Ajustar" if item.get('requires_adjustment') else "-"
+                "Estado": item['state'].upper() if item.get('found') else "N/A",
+                "Status": item['status_emoji']
             })
             
         st.dataframe(
@@ -115,9 +141,12 @@ def render_comparison_component():
             use_container_width=True,
             hide_index=True,
             column_config={
-                "Status": st.column_config.TextColumn("St", width="small"),
-                "Ação": st.column_config.TextColumn("Ação", width="medium"),
-            }
+                "Timestamp": st.column_config.DatetimeColumn("Hora", format="HH:mm:ss"),
+                "Serial": st.column_config.TextColumn("Serial", width="medium"),
+                "Estado": st.column_config.TextColumn("Estado", width="small"),
+                "Status": st.column_config.TextColumn("St", width="small")
+            },
+            height=300
         )
     else:
-        st.info("Nenhum item verificado nesta sessão.")
+        st.info("💡 Bipe um equipamento para começar.")

@@ -108,6 +108,15 @@ def export_adjustment_list(equipment_list: pd.DataFrame) -> bytes:
     try:
         # Add verification timestamp
         equipment_list = equipment_list.copy()
+        
+        # Normalize column names if coming from scanned_items (lowercase)
+        column_mapping = {
+            'serialnumber': 'Serialnumber',
+            'state': 'State',
+            'name': 'Name'
+        }
+        equipment_list = equipment_list.rename(columns=column_mapping)
+        
         equipment_list['Data_Verificacao'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
         # Ensure columns are in correct order
@@ -130,4 +139,51 @@ def export_adjustment_list(equipment_list: pd.DataFrame) -> bytes:
     
     except Exception as e:
         print(f"Erro ao exportar lista de ajustes: {str(e)}")
+        return b''
+
+
+def export_scanned_history(history_data: list) -> bytes:
+    """
+    Exporta histórico de verificação para bytes.
+    
+    Args:
+        history_data: Lista de dicionários com resultados da verificação
+        
+    Returns:
+        Bytes do arquivo Excel gerado
+    """
+    try:
+        if not history_data:
+            return b''
+            
+        df = pd.DataFrame(history_data)
+        
+        # Select and rename columns for better readability if needed
+        # Ensure timestamp is formatted
+        if 'timestamp' in df.columns:
+            df['timestamp'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y-%m-%d %H:%M:%S')
+            
+        # Reorder columns to put timestamp first if present
+        cols = df.columns.tolist()
+        if 'timestamp' in cols:
+            cols.remove('timestamp')
+            cols = ['timestamp'] + cols
+            df = df[cols]
+            
+        # Sanitize all values
+        for col in df.columns:
+            df[col] = df[col].apply(
+                lambda x: sanitize_excel_value(str(x)) if pd.notna(x) else ''
+            )
+            
+        # Export to bytes
+        from io import BytesIO
+        output = BytesIO()
+        df.to_excel(output, index=False, engine='openpyxl')
+        output.seek(0)
+        
+        return output.getvalue()
+        
+    except Exception as e:
+        print(f"Erro ao exportar histórico: {str(e)}")
         return b''

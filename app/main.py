@@ -3,7 +3,8 @@ import streamlit as st
 from app.config import PAGE_TITLE, PAGE_ICON
 from app.components.upload_component import render_upload_component
 from app.components.scanner_input import render_scanner_input
-from app.components.comparison_component import render_comparison_component
+from app.components.comparison_component import render_comparison_component, render_session_metrics
+from app.components.report_component import render_report_component
 
 def main():
     st.set_page_config(
@@ -62,12 +63,13 @@ def main():
             pass
         
     with tab2:
+        render_session_metrics()
         render_scanner_input()
         st.divider()
         render_comparison_component()
         
     with tab3:
-        st.info("🚧 Em breve: Relatórios e exportação")
+        render_report_component()
 
 if __name__ == "__main__":
     main()

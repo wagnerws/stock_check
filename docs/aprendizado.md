@@ -178,6 +178,41 @@ app/
 └── utils/        # Helpers e constantes
 ```
 
+#### 📊 Visual Hierarchy em Streamlit (09/01/2026)
+
+**Contexto:**
+Refinamento da interface de verificação (P2-003) para melhorar a velocidade de operação e clareza.
+
+**Aprendizado:**
+1. **Métricas no Topo:** Usar `st.metric` em colunas (`st.columns`) no topo da página fornece feedback imediato sobre o progresso sem necessidade de rolar.
+2. **Visual Feedback com Containers:** Para resultados críticos (como sucesso/erro de um scan), usar `st.container(border=True)` combinado com cores semânticas e tipografia hierárquica (títulos menores, dados grandes) é muito mais eficaz que apenas `st.success` ou `st.error`.
+3. **HTML/CSS Inline Seguro:** Para ajustes finos de fonte (tamanho, peso) que o Markdown nativo não suporta, `st.markdown(unsafe_allow_html=True)` com estilos inline específicos (`<div style="...">`) é uma solução válida e rápida, desde que o conteúdo injetado seja sanitizado.
+
+**Resultado:**
+Interface mais profissional e intuitiva para o operador.
+
+---
+
+#### 📤 Exportação de Dados e Sanitização (09/01/2026)
+
+**Contexto:**
+Implementação da exportação de relatórios Excel (P2-004).
+
+**Aprendizado:**
+Ao exportar dados gerados pela aplicação que serão abertos em Excel:
+1. **Sanitização de Fórmulas:** É crítico prevenir *CSV/Formula Injection*. Qualquer campo começando com `=`, `+`, `-`, `@` deve ser escapado (ex: adicionando `'` no início).
+2. **BytesIO:** Para download direto sem salvar em disco, usar `io.BytesIO` e passar como argumento `data=` para `st.download_button`.
+
+**Código Exemplo:**
+```python
+output = BytesIO()
+df.to_excel(output, index=False)
+st.download_button(..., data=output.getvalue(), ...)
+```
+
+---
+
+**Última Atualização:** 09/01/2026 - 14:45 BRT
 **Benefício:**  
 Separação clara de responsabilidades = código mais testável e manutenível.
 

@@ -122,26 +122,28 @@
 ---
 
 ### P2-003: Interface de Verificação em Tempo Real
-**Status:** 🟡 Pendente  
+**Status:** ✅ Concluída  
+**Data Conclusão:** 09/01/2026  
 **Dependências:** P2-002  
 **Complexidade:** Média  
 **Descrição:**
-- Display de informações do item encontrado
-- Indicadores visuais claros (✅ OK, ⚠️ Atenção, ❌ Não encontrado)
-- Histórico dos últimos itens verificados
-- Contador de progresso
+- Display de métricas de sessão (Total, OK, Ajuste)
+- Indicadores visuais aprimorados (Cards coloridos)
+- Histórico simplificado
+- Layout otimizado para operação em lote
 
 ---
 
 ### P2-004: Exportação para Excel
-**Status:** 🟡 Pendente  
+**Status:** ✅ Concluída  
+**Data Conclusão:** 09/01/2026  
 **Dependências:** P2-002  
 **Complexidade:** Média  
 **Descrição:**
 - Gerar arquivo Excel com itens que estão como "ativo"
 - Incluir colunas: Serialnumber, State atual, Data de verificação
 - Download automático do arquivo
-- Nomenclatura clara (ex: ajustes_lansweeper_YYYY-MM-DD.xlsx)
+- Nomenclatura: `ajustar_lansweeper.xlsx` e `verificacao_stock_{data}.xlsx`
 
 ---
 
