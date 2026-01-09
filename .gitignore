@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+dist/
+build/
+
+# Streamlit
+.streamlit/secrets.toml
+.streamlit/
+
+# Environment
+.env
+*.log
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data - Permitir apenas fixtures de teste
+*.xlsx
+*.xls
+!tests/fixtures/*.xlsx
+!tests/fixtures/*.xls
+
+# SSH Keys
+*.ppk
+deploy_key
+deploy_key.pub
+stock_key.pub
+stock_private.ppk

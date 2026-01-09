@@ -1,0 +1,3 @@
+"""
+Componentes Streamlit da aplicação.
+"""
