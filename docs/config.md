@@ -164,21 +164,15 @@ def validate_serial_number(serial: str) -> bool:
 
 ## 🔄 Resume Point
 
-**Status Atual:** Fase P1 (Crítico) 100% Concluída. P1-005 finalizada.
+**Status Atual:** Fase P2 em andamento. P2-002 (Comparação Base) Concluída.
 
-**Próximos Passos (Início da Fase P2):**
-1. **P2-001: Validação de Estados**
-   - Definir regras de negócio para classificar equipamentos como "stock", "broken", "active", etc.
-   - Atualizar `validator.py` com essa lógica.
-
-2. **P2-002: Módulo de Comparação**
-   - Conectar o serial lido pelo scanner (agora funcional) com a busca no DataFrame carregado.
-   - Exibir na tela as informações do equipamento encontrado.
+**Próximos Passos:**
+1. **P2-003: Interface de Verificação em Tempo Real** (já iniciada no Comparison Module, pode precisar de refinamento).
+2. **P2-004: Exportação para Excel** (Lista de Ajustes).
 
 **Tarefas do Backlog em Foco:**
-- ✅ **P1-005:** Integração com Leitor de Código de Barras - **CONCLUÍDA** (09/01/2026)
-- 🟡 **P2-001:** Validação de Estados - **PRÓXIMA**
-- 🟡 **P2-002:** Módulo de Comparação Serial x Base - **PRÓXIMA**
+- ✅ **P2-002:** Comparação Serial x Base - **CONCLUÍDA** (09/01/2026)
+- 🟡 **P2-004:** Exportação para Excel - **PRÓXIMA**
 
 ---
 

@@ -501,3 +501,70 @@ Implementação de suporte para leitor de código de barras físico (Zebra DS22)
 #### Próximos Passos (Prioridade 2)
 1. **P2-001:** Validação de estados (definir regras para "stock", "broken" vs "active")
 2. **P2-002:** Conectar o scanner com a busca no Excel carregado
+
+---
+
+## Data: 09/01/2026 - 13:00 BRT
+
+### 11. Validação de Estados e Seriais (P2-001)
+
+#### Contexto
+Implementação das regras de negócio para validar estados e identificar equipamentos que requerem ajuste.
+
+#### Mudanças Realizadas
+
+**Serviços:**
+- `app/services/validator.py` - **IMPLEMENTADO**
+  - Funções: `validate_state`, `requires_adjustment`, `validate_serial_number`
+  - Utiliza constantes centralizadas (`VALID_STATES`)
+  - Tratamento case-insensitive para robustez
+
+**Testes:**
+- `tests/unit/test_validator.py` - **CRIADO**
+  - 100% de cobertura das funções de validação
+
+#### Métricas
+- **Progresso P2:** 1/4 tarefas (25%)
+- **Progresso Geral:** 6/14 tarefas (42.8%)
+
+#### Próximos Passos
+1. **P2-002:** Módulo de Comparação Serial x Base
+
+---
+
+## Data: 09/01/2026 - 13:35 BRT
+
+### 12. Implementação do Módulo de Comparação (P2-002)
+
+#### Contexto
+Implementação da funcionalidade core do sistema: comparar o serial bipado com a base de dados do Lansweeper carregada na memória.
+
+#### Mudanças Realizadas
+
+**Serviços:**
+- `app/services/comparator.py`: Implementada lógica `compare_and_flag` para identificar se o item existe, se é 'active' (requer ajuste) ou 'stock'.
+- **Testes Unitários:** Criado `tests/unit/test_comparator.py` com 8 testes cobrindo todos os cenários.
+
+**Componentes:**
+- `app/components/scanner_input.py`: Refatorado para processar o input e chamar o comparador imediatamente.
+- `app/components/comparison_component.py`: Implementado display visual (Cards Verde/Amarelo/Vermelho) e histórico da sessão.
+- **Correção de Bug:** Ajustada chave de session_state em `upload_component.py` de `lansweeper_data` para `dataframe`, corrigindo bug onde a base não era reconhecida.
+
+**Main App:**
+- `app/main.py`: Integrada a renderização dos novos componentes na aba de Verificação.
+
+#### Funcionalidades
+- ✅ **Comparação em Tempo Real:** Feedback imediato ao bipar.
+- ✅ **Lógica de Estado:**
+  - 🟢 **OK:** Itens 'stock', 'broken', 'stolen', 'old'.
+  - 🟡 **Alerta:** Itens 'active' mostram Hostname e Usuário para facilitar baixa no Lansweeper.
+  - 🔴 **Erro:** Item não encontrado na base.
+- ✅ **Histórico da Sessão:** Tabela com últimos itens verificados.
+
+#### Métricas
+- **Progresso P2:** 2/4 tarefas (50%)
+- **Progresso Geral:** 7/14 tarefas (50%)
+
+#### Próximos Passos
+1. **P2-003:** Melhorar interface de verificação (já parcialmente feita, revisar requisitos).
+2. **P2-004:** Exportação para Excel (Gerar lista de ajustes).

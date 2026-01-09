@@ -337,3 +337,39 @@ def process_scan_callback():
 ```
 
 ---
+
+#### 🔍 Validação Robusta e Case-Insensitive (09/01/2026)
+
+**Contexto:**
+Dados de entrada (arquivos Excel, inputs manuais) nem sempre seguem padrão de caixa (maiúscula/minúscula).
+
+**Aprendizado:**
+Ao validar inputs contra uma lista de constantes (ex: `VALID_STATES`), sempre normalizar para padronizar comparação.
+
+**Solução:**
+```python
+def validate_state(state):
+    # Strip e lower para garantir match
+    state_lower = state.strip().lower()
+    if state_lower in VALID_STATES:
+        return True
+    return False
+```
+Evita falsos negativos frustrantes para o usuário.
+
+---
+
+---
+
+#### 🐛 Consistency em Session State (09/01/2026)
+
+**Contexto:**
+O componente de Upload salvava o dataframe em `st.session_state.lansweeper_data`, mas o restante da aplicação esperava `st.session_state.dataframe`. Isso causava a falha "Nenhuma base carregada" mesmo após um upload bem sucedido.
+
+**Aprendizado:**
+- Manter um **Dicionário de Dados** ou constantes para chaves de sessão é vital.
+- Ex: `SESSION_KEY_DATAFRAME = 'dataframe'`.
+- Ao refatorar ou copiar código de outros projetos/snippets, verificar sempre se as chaves da sessão batem com a arquitetura atual.
+
+**Correção:**
+Unificado tudo para usar `st.session_state.dataframe`.

@@ -97,7 +97,7 @@ def render_upload_component() -> Optional[pd.DataFrame]:
             _render_data_preview(df)
             
             # Store in session state
-            st.session_state.lansweeper_data = df
+            st.session_state.dataframe = df
             st.session_state.filename = uploaded_file.name
             
             return df

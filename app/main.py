@@ -3,6 +3,7 @@ import streamlit as st
 from app.config import PAGE_TITLE, PAGE_ICON
 from app.components.upload_component import render_upload_component
 from app.components.scanner_input import render_scanner_input
+from app.components.comparison_component import render_comparison_component
 
 def main():
     st.set_page_config(
@@ -62,6 +63,8 @@ def main():
         
     with tab2:
         render_scanner_input()
+        st.divider()
+        render_comparison_component()
         
     with tab3:
         st.info("🚧 Em breve: Relatórios e exportação")

@@ -92,18 +92,25 @@
 ## 🟡 Prioridade 2 (P2) - Importante
 
 ### P2-001: Validação de Estados
-**Status:** 🟡 Pendente  
-**Dependências:** P1-003  
-**Complexidade:** Baixa  
+**Status:** ✅ Concluída
+**Data Conclusão:** 09/01/2026
+**Dependências:** P1-003
+**Complexidade:** Baixa
 **Descrição:**
 - Definir lista de estados válidos: stock, broken, stolen, in repair, old
 - Implementar lógica de identificação de estados "ativo"
 - Criar regras de negócio para classificação
 
+**Resultados:**
+- ✅ `app/services/validator.py` implementado
+- ✅ Testes unitários 100% passing (`tests/unit/test_validator.py`)
+- ✅ Validação centralizada via constantes
+
 ---
 
 ### P2-002: Módulo de Comparação Serial x Base
-**Status:** 🟡 Pendente  
+**Status:** ✅ Concluída  
+**Data Conclusão:** 09/01/2026  
 **Dependências:** P1-003, P1-005  
 **Complexidade:** Média  
 **Descrição:**

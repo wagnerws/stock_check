@@ -65,15 +65,59 @@ def render_comparison_component():
     Renderiza componente de comparação de dados.
     
     Funcionalidades:
-    - Display de informações do equipamento encontrado
+    - Display de informações do equipamento encontrado (último bip)
     - Indicadores visuais (✅ OK, ⚠️ Atenção, ❌ Não encontrado)
-    - Histórico de verificações
-    - Contador de progresso
+    - Histórico de verificações em tabela
+    - Reset de histórico
     """
-    st.info("ℹ️ Componente de comparação em tempo real será implementado aqui")
-    st.markdown("""
-    **Funcionalidades planejadas:**
-    - 📊 Histórico de verificações
-    - 📈 Contador de progresso
-    - 🔍 Busca rápida de equipamentos
-    """)
+    st.markdown("### 📊 Resultado da Verificação")
+    
+    # 1. Exibir resultado do último scan (destaque)
+    if 'last_scan_result' in st.session_state and st.session_state.last_scan_result:
+        result = st.session_state.last_scan_result
+        
+        # Container visual para o resultado
+        container_color = "green"
+        if result.get('requires_adjustment'):
+             container_color = "orange" # ou yellow
+        elif not result.get('found'):
+             container_color = "red"
+             
+        # Usando st.container com border (Streamlit 1.30+) ou apenas markdown com style
+        with st.container(border=True):
+             render_comparison_result(result)
+
+    # 2. Histórico de Verificações
+    if 'scanned_items' in st.session_state and st.session_state.scanned_items:
+        st.divider()
+        col_hist_1, col_hist_2 = st.columns([0.8, 0.2])
+        col_hist_1.markdown("#### 🕒 Histórico Recente")
+        
+        if col_hist_2.button("Limpar", type="primary"):
+            st.session_state.scanned_items = []
+            st.session_state.last_scan_result = None
+            st.rerun()
+
+        # Prepara dados para tabela
+        # Precisamos converter a lista de dicts para um formato amigável
+        history_data = []
+        for item in st.session_state.scanned_items:
+            history_data.append({
+                "Hora": item['timestamp'].strftime("%H:%M:%S"),
+                "Serial": item['serialnumber'],
+                "Status": item['status_emoji'],
+                "Mensagem": item['status_message'],
+                "Ação": "Ajustar" if item.get('requires_adjustment') else "-"
+            })
+            
+        st.dataframe(
+            history_data,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Status": st.column_config.TextColumn("St", width="small"),
+                "Ação": st.column_config.TextColumn("Ação", width="medium"),
+            }
+        )
+    else:
+        st.info("Nenhum item verificado nesta sessão.")
