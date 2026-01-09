@@ -164,15 +164,16 @@ def validate_serial_number(serial: str) -> bool:
 
 ## 🔄 Resume Point
 
-**Status Atual:** Fase P2 (Prioridade 2) Concluída! 🚀
+**Status Atual:** Fase P3 (Prioridade 3) em Andamento 🚀
 
 **Próximos Passos:**
-1. **P3-001: Relatórios e Estatísticas** (Gráficos e dashboards).
-2. **P3-002: Histórico Persistente** (Banco de dados ou json local).
+1. **P3-002: Histórico de Verificações** (Persistência de dados).
+2. **P3-003: Modo Batch** (Upload de lista de seriais).
 
 **Tarefas do Backlog em Foco:**
-- ✅ **P2-003:** Interface Verificação - **CONCLUÍDA** (Interface aprimorada)
-- 🟡 **P3-001:** Relatórios e Estatísticas - **PRÓXIMA**
+- ✅ **P3-001:** Relatórios e Estatísticas - **CONCLUÍDA**
+- 🟡 **P3-002:** Histórico de Verificações - **PRÓXIMA**
+
 
 ---
 

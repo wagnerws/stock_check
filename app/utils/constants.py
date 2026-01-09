@@ -12,6 +12,16 @@ VALID_STATES = {
     'active': '⚠️ ATIVO - Requer ajuste no Lansweeper'
 }
 
+# Mapa de Emojis para visualização
+STATE_EMOJI = {
+    'stock': '✅',
+    'broken': '🔧',
+    'stolen': '🚨',
+    'in repair': '⚙️',
+    'old': '📦',
+    'active': '⚠️'
+}
+
 # Lista de estados que NÃO requerem ajuste manual
 OK_STATES = ['stock', 'broken', 'stolen', 'in repair', 'old']
 

@@ -568,3 +568,63 @@ Implementação da funcionalidade core do sistema: comparar o serial bipado com 
 #### Próximos Passos
 1. **P2-003:** Melhorar interface de verificação (já parcialmente feita, revisar requisitos).
 2. **P2-004:** Exportação para Excel (Gerar lista de ajustes).
+
+---
+
+## Data: 09/01/2026 - 13:50 BRT
+
+### 13. Interface de Verificação em Tempo Real (P2-003)
+
+#### Contexto
+Melhoria da interface visual para operação contínua e rápida.
+
+#### Mudanças
+- **Cards Coloridos:** Feedback visual instantâneo (Verde/Amarelo/Vermelho) em `comparison_component.py`.
+- **Layout Fixo:** Colunas organizadas para leitura rápida.
+- **Métricas da Sessão:** Contadores de Total, OK e Ajuste no topo da aba.
+
+#### Resultados
+- ✅ Interface validada para fluxo rápido de scans.
+
+---
+
+## Data: 09/01/2026 - 14:30 BRT
+
+### 14. Exportação de Relatórios Excel (P2-004)
+
+#### Contexto
+Necessidade de extrair os dados verificados para uso externo (baixa no Lansweeper).
+
+#### Mudanças
+- **Exportação de Ajustes:** Gerar planilha apenas com itens 'active' (`export_adjustment_list`).
+- **Exportação de Histórico:** Gerar planilha com tudo que foi bipado (`export_scanned_history`).
+- **Colunas:** Inclusão de Name e LastUser para facilitar identificação.
+
+#### Status
+- ✅ P2 Completa.
+
+---
+
+## Data: 09/01/2026 - 15:20 BRT
+
+### 15. Dashboard de Relatórios e Estatísticas (P3-001)
+
+#### Contexto
+Implementação de visualização gráfica e métricas agregadas para acompanhamento macro.
+
+#### Mudanças
+- **Novo Componente:** `app/components/report_component.py` transformado em Dashboard.
+- **Novo Serviço:** `app/services/report_metrics.py` para isolar lógica de cálculo.
+- **Visualização:**
+  - Barra de Progresso Geral (Scanned / Total Dataframe).
+  - Gráfico de Barras com distribuição de estados.
+  - Tabelas de resumo.
+- **Testes:**
+  - `tests/unit/test_report_metrics.py` criado (100% pass).
+
+#### Métricas
+- **Progresso P3:** 1/5 tarefas (20%).
+- **Progresso Geral:** 10/14 tarefas (71.4%).
+
+#### Próximos Passos
+1. **P3-002:** Histórico persistente (evitar perda ao recarregar página).
