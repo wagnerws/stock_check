@@ -70,14 +70,22 @@
 ---
 
 ### P1-005: Integração com Leitor de Código de Barras
-**Status:** 🟡 Pendente  
+**Status:** ✅ Concluída  
+**Data Conclusão:** 09/01/2026 12:45 BRT  
 **Dependências:** P1-002  
-**Complexidade:** Alta  
+**Complexidade:** Média  
 **Descrição:**
-- Pesquisar APIs/bibliotecas para captura de input de barcode scanner
-- Implementar captura em tempo real do serial
-- Tratamento de diferentes formatos (QR Code, Code 128, etc.)
-- Fallback para input manual (caso do Macbook)
+- Implementar captura de código de barras via leitor USB (Zebra DS22)
+- Componente de input otimizado com fluxo de "Enter" automático
+- Validação de duplicidade na sessão (toast warning)
+- Histórico visual de itens bipados
+- Fallback para input manual (o mesmo campo atende ambos)
+
+**Resultados:**
+- ✅ `scanner_input.py` criado
+- ✅ `barcode_handler.py` com validação de duplicidade
+- ✅ Integração completa na aba Verificação
+- ✅ Testado com fluxo de teclado/scanner USB
 
 ---
 

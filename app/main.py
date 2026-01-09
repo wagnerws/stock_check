@@ -1,101 +1,70 @@
-"""
-Entry point da aplicação Stock Check.
-
-Para executar: streamlit run app/main.py
-"""
 
 import streamlit as st
 from app.config import PAGE_TITLE, PAGE_ICON
 from app.components.upload_component import render_upload_component
+from app.components.scanner_input import render_scanner_input
 
-# Configuração da página
-st.set_page_config(
-    page_title=PAGE_TITLE,
-    page_icon=PAGE_ICON,
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+def main():
+    st.set_page_config(
+        page_title="Stock Check - Anbima",
+        page_icon="📦",
+        layout="wide",
+        initial_sidebar_state="expanded"
+    )
 
-# Initialize session state
-if 'lansweeper_data' not in st.session_state:
-    st.session_state.lansweeper_data = None
-if 'filename' not in st.session_state:
-    st.session_state.filename = None
+    # Initialize session state variables if they don't exist
+    if 'dataframe' not in st.session_state:
+        st.session_state.dataframe = None
+    if 'filename' not in st.session_state:
+        st.session_state.filename = None
 
-# Header principal
-st.title("📦 Stock Check - Controle de Estoque")
-st.markdown(
-    """
-    Sistema de verificação física de equipamentos com integração ao **Lansweeper**.
+    # Sidebar
+    st.sidebar.title("📦 Stock Check")
+    st.sidebar.caption("v0.2.1")
     
-    ---
-    """
-)
-
-# Main content
-tab1, tab2, tab3 = st.tabs(["📥 Upload", "🔍 Verificação", "📊 Relatórios"])
-
-with tab1:
-    # Upload component
-    df = render_upload_component()
+    st.sidebar.divider()
     
-    if df is not None:
-        st.success(f"✅ Base carregada: **{st.session_state.filename}**")
-
-with tab2:
-    st.info("🚧 **Em desenvolvimento** - Módulo de verificação por código de barras")
-    
-    if st.session_state.lansweeper_data is not None:
-        st.markdown(
-            f"""
-            **Base carregada:** {st.session_state.filename}  
-            **Registros:** {len(st.session_state.lansweeper_data)}  
-            **Status:** Pronto para verificação
-            """
-        )
+    # Status na sidebar
+    if st.session_state.dataframe is not None:
+        st.sidebar.success("✅ Base de Dados Carregada")
+        st.sidebar.metric("Total de Itens", len(st.session_state.dataframe))
     else:
-        st.warning("⚠️ Faça upload da base Lansweeper na aba **Upload** primeiro")
+        st.sidebar.warning("⚠️ Nenhuma base carregada")
 
-with tab3:
-    st.info("🚧 **Em desenvolvimento** - Relatórios e estatísticas")
-    
-    if st.session_state.lansweeper_data is not None:
-        st.markdown("**Próximas funcionalidades:**")
-        st.markdown(
-            """
-            - 📈 Análise de distribuição por estado
-            - 🔍 Equipamentos que requerem ajuste
-            - 📤 Exportação de relatórios em Excel
-            """
-        )
+    items_verified = len(st.session_state.scanned_items) if 'scanned_items' in st.session_state else 0
+    st.sidebar.metric("Itens Verificados (Sessão)", items_verified)
 
-# Sidebar informativo
-with st.sidebar:
-    st.header("ℹ️ Informações")
-    
-    if st.session_state.lansweeper_data is not None:
-        st.success(f"✅ Base carregada")
-        st.caption(f"Arquivo: {st.session_state.filename}")
-        st.caption(f"Registros: {len(st.session_state.lansweeper_data)}")
-    else:
-        st.warning("⚠️ Nenhuma base carregada")
-    
-    st.divider()
-    
-    st.markdown(
+    st.sidebar.divider()
+    st.sidebar.info(
         """
         **Estados Válidos:**
-        - ✅ Stock (Em estoque)
-        - 🔧 Broken (Quebrado)
-        - 🚨 Stolen (Roubado)
-        - ⚙️ In Repair (Em reparo)
-        - 📦 Old (Antigo)
-        - ⚠️ Active (Requer ajuste)
+        - ✅ Stock
+        - 🔧 Broken
+        - 🚨 Stolen
+        - ⚙️ In Repair
+        - 📦 Old
         """
     )
     
-    st.divider()
+    # Main Content
+    st.title("Controle de Estoque Físico")
     
-    st.markdown("**Versão:** 0.2.0")
-    st.markdown("**Stack:** Streamlit + Python + Pandas")
+    tab1, tab2, tab3 = st.tabs(["📤 Upload", "🔍 Verificação", "📊 Relatórios"])
+    
+    with tab1:
+        # Upload component
+        df = render_upload_component()
+        
+        if df is not None:
+            # Atualiza session state se necessário (geralmente tratado dentro do component, mas reforçando)
+            # st.session_state.dataframe = df (render_upload_component já faz isso)
+            pass
+        
+    with tab2:
+        render_scanner_input()
+        
+    with tab3:
+        st.info("🚧 Em breve: Relatórios e exportação")
 
+if __name__ == "__main__":
+    main()

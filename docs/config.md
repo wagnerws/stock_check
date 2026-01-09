@@ -164,27 +164,21 @@ def validate_serial_number(serial: str) -> bool:
 
 ## 🔄 Resume Point
 
-**Status Atual:** P1-003 e P1-004 concluídas (4/5 tarefas P1), interface funcional testada
+**Status Atual:** Fase P1 (Crítico) 100% Concluída. P1-005 finalizada.
 
-**Próximos Passos:**
-1. Implementar P1-005: Integração com leitor de código de barras
-   - Pesquisar bibliotecas (pyzbar, opencv)
-   - Implementar captura em tempo real
-   - Criar fallback para input manual
+**Próximos Passos (Início da Fase P2):**
+1. **P2-001: Validação de Estados**
+   - Definir regras de negócio para classificar equipamentos como "stock", "broken", "active", etc.
+   - Atualizar `validator.py` com essa lógica.
 
-2. Iniciar P2-002: Módulo de Comparação Serial x Base
-   - Implementar busca otimizada
-   - Criar lógica de comparação
-   - Flag para equipamentos ativos
-
-3. Criar interface de verificação em tempo real (P2-003)
+2. **P2-002: Módulo de Comparação**
+   - Conectar o serial lido pelo scanner (agora funcional) com a busca no DataFrame carregado.
+   - Exibir na tela as informações do equipamento encontrado.
 
 **Tarefas do Backlog em Foco:**
-- ✅ **P1-001:** Decisão de Arquitetura - **CONCLUÍDA** (08/01/2026)
-- ✅ **P1-002:** Estrutura Base do Projeto - **CONCLUÍDA** (08/01/2026 20:30)
-- ✅ **P1-003:** Módulo de Importação Excel - **CONCLUÍDA** (08/01/2026 23:30)
-- ✅ **P1-004:** Interface de Upload e Preview - **CONCLUÍDA** (08/01/2026 23:40)
-- 🟡 **P1-005:** Integração com Leitor de Código de Barras - **PRÓXIMA**
+- ✅ **P1-005:** Integração com Leitor de Código de Barras - **CONCLUÍDA** (09/01/2026)
+- 🟡 **P2-001:** Validação de Estados - **PRÓXIMA**
+- 🟡 **P2-002:** Módulo de Comparação Serial x Base - **PRÓXIMA**
 
 ---
 

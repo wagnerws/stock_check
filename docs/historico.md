@@ -170,7 +170,7 @@ stock_check/
 ├── tests/
 │   ├── unit/
 │   ├── integration/
-│   └── fixtures/
+│   ├── fixtures/
 └── docs/
 ```
 
@@ -456,5 +456,48 @@ python -m streamlit run app/main.py
 
 ---
 
-**Última Atualização:** 2026-01-08 23:45 BRT
+## Data: 09/01/2026 - 12:40 BRT
 
+### 10. Integração com Leitor de Código de Barras USB (P1-005)
+
+#### Contexto
+Implementação de suporte para leitor de código de barras físico (Zebra DS22) que emula teclado.
+
+#### Mudanças Realizadas
+
+**Serviços:**
+- `app/services/barcode_handler.py` - **CRIADO**
+  - Lógica de limpeza e validação de serial
+  - Validação de duplicidade na sessão (impedir bipes repetidos)
+
+**Componentes:**
+- `app/components/scanner_input.py` - **CRIADO**
+  - Campo de texto otimizado para input rápido
+  - Sistema de mensagens Toast para feedback instantâneo
+  - Histórico visual dos últimos itens bipados
+
+**Main App:**
+- `app/main.py` - **MODIFICADO**
+  - Integração na aba "Verificação"
+  - Correção de erro de sintaxe detectado durante testes
+
+#### Funcionalidades
+
+**1. Input via Scanner:**
+- Usuário foca no campo -> Bipa -> Sistema processa Enter automático.
+
+**2. Validação de Duplicidade:**
+- Se o mesmo item for bipado duas vezes na mesma sessão, exibe alerta (Toast amarelo de aviso) e não registra novamente.
+
+**3. Feedback Visual:**
+- ✅ Sucesso: Toast verde + mensagem de registro.
+- ⚠️ Atenção: Toast amarelo para duplicatas.
+- ❌ Erro: Toast vermelho para seriais inválidos/curtos.
+
+#### Métricas
+- **Progresso P1:** 5/5 tarefas (100% - Fase P1 Completa!) 🎉
+- **Progresso Geral:** 5/14 tarefas (35.7%)
+
+#### Próximos Passos (Prioridade 2)
+1. **P2-001:** Validação de estados (definir regras para "stock", "broken" vs "active")
+2. **P2-002:** Conectar o scanner com a busca no Excel carregado

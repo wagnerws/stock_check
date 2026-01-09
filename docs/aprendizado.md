@@ -309,3 +309,31 @@ Sempre considerar exibição condicional de dados baseada em **contexto** e **es
 ---
 
 **Última Atualização:** 2026-01-08 20:46 BRT
+
+#### 📷 Integração com Scanner USB (09/01/2026)
+
+**Contexto:**
+Integração de leitores de código de barras físicos (como Zebra DS22) em aplicações Web/Streamlit.
+
+**Aprendizado:**
+Leitores USB geralmente comportam-se como teclados (HID). Ao ler um código, eles enviam a string seguida de um `ENTER`.
+- **Não é necessário** usar bibliotecas complexas de câmera (OpenCV/PyZbar) se o hardware for dedicado.
+- O campo `st.text_input` do Streamlit captura o `ENTER` automaticamente e dispara o `on_change` ou reload.
+- **UX:** É vital instruir o usuário a manter o foco no campo de input.
+- **Validação de Duplicidade:** Como a leitura é muito rápida, é comum bipar o mesmo item 2x sem querer. Implementar verificação na sessão (`if serial in st.session_state.scanned_items`) é essencial para evitar registros sujos.
+
+**Solução Adotada:**
+```python
+# Componente simples
+st.text_input(..., on_change=process_scan_callback)
+
+# Callback
+def process_scan_callback():
+    serial = st.session_state.input_val
+    if serial in st.session_state.history:
+        st.toast("Já verificado!", icon="⚠️")
+        return
+    # ... processa
+```
+
+---
