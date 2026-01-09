@@ -1,5 +1,13 @@
 
+
 import streamlit as st
+import sys
+import os
+
+# Adicionar a raiz do projeto ao sys.path para garantir que imports absolutos (app.config) funcionem
+# quando rodar via 'streamlit run app/main.py'
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from app.config import PAGE_TITLE, PAGE_ICON
 from app.components.upload_component import render_upload_component
 from app.components.scanner_input import render_scanner_input
