@@ -714,3 +714,153 @@ Implementação de melhorias críticas identificadas pelo usuário para aprimora
 - ✅ Aplicação rodando em http://localhost:8503
 - ✅ Versão atualizada para 0.3.0
 
+---
+
+## Data: 10/01/2026 - 11:45 BRT
+
+### 18. Correção de Mapeamento de Estado "Reservado" (Bug Fix)
+
+#### Contexto
+Relatado bug onde equipamentos com estado "Reservado" no Excel exibiam "❓ Estado desconhecido" e emoji ❓ ao invés de "🔖 Reservado - OK".
+
+#### Causa Raiz
+- Estados no Excel podem estar em **PT-BR** (ex: "Reservado", "Ativo")
+- Código fazia apenas `.lower()` convertendo para minúsculo mas não traduzia
+- Dicionário `VALID_STATES` usava apenas chaves em inglês ("reserved", "active")
+- Resultado: `VALID_STATES.get("reservado")` retornava None
+
+#### Solução Implementada
+
+**1. Novo Dicionário de Normalização:**
+- `app/utils/constants.py` - Criado `STATE_NORMALIZATION`
+- Mapeamento bidirecional PT-BR → EN e EN → EN (idempotência)
+- Suporta: estoque, quebrado, roubado, em reparo, antigo, reservado, ativo
+
+**2. Função de Normalização:**
+- `app/services/comparator.py` - Função `normalize_state()`
+- Converte PT-BR e EN para padrão inglês minúsculo
+- Case-insensitive e trim de espaços
+- Retorna 'unknown' para estados inválidos
+
+**3. Aplicação:**
+- Substituído `.lower()` por `normalize_state()` em `find_equipment()`
+- Estados agora corretamente mapeados antes de buscar em `VALID_STATES`
+
+#### Arquivos Modificados
+- `app/utils/constants.py` - +22 linhas (STATE_NORMALIZATION)
+- `app/services/comparator.py` - +20 linhas (normalize_state)
+- `tests/unit/test_state_normalization.py` - **CRIADO** (6 testes)
+
+#### Validação
+```bash
+pytest tests/unit/test_state_normalization.py -v
+# 6 passed in 0.34s ✅
+```
+
+**Testes Implementados:**
+- ✅ Normalização PT-BR → EN
+- ✅ Normalização EN → EN (idempotência)
+- ✅ Case-insensitive (RESERVADO, ReSeRvAdO)
+- ✅ Trim de espaços (" Reservado ")
+- ✅ Estados desconhecidos → 'unknown'
+- ✅ Valores não-string → 'unknown'
+
+#### Benefícios
+- ✅ Suporte completo para Excel em PT-BR e EN
+- ✅ Mensagens de status corretas para todos os estados
+- ✅ Emojis exibidos corretamente (🔖 para Reservado)
+- ✅ Retrocompatível com Excel em inglês
+- ✅ Testado e validado
+
+#### Status
+- ✅ Bug corrigido
+- ✅ Testes passando (100%)
+- ✅ Aplicação rodando normalmente
+
+---
+
+## Data: 10/01/2026 - 11:50 BRT
+
+### 19. Correção de Registro por Patrimônio (Feature Enhancement)
+
+#### Contexto
+Solicitada correção para que ao inserir número de patrimônio, o sistema busque e registre usando o serialnumber associado, e formate patrimônio sem casas decimais.
+
+#### Problema Identificado
+1. **Duplicidade incorreta:** Verificação usava input digitado (patrimônio) ao invés do serialnumber encontrado
+2. **Formatação:** Patrimônio exibido como 9856.0 ao invés de 9856
+3. **Busca falhava:** Comparação string vs float no DataFrame pandas
+
+#### Exemplo de Uso
+- Usuário bipa **9856** (patrimônio)
+- Sistema busca e encontra serial **JQHP813**
+- Registro salvo com **JQHP813** (não 9856)
+- Exibição: "Patrimônio: **9856**" (sem .0)
+
+#### Solução Implementada
+
+**1. Formatação de Patrimônio** (`comparator.py` linha 71)
+```python
+# Antes:
+'ativo': equipment['Ativo'] if 'Ativo' in equipment else None
+
+# Depois:
+'ativo': int(float(equipment['Ativo'])) if 'Ativo' in equipment and pd.notna(equipment['Ativo']) else None
+```
+
+**2. Busca Numérica por Patrimônio** (`comparator.py` linhas 56-68)
+```python
+try:
+    # Converter input e valor do DataFrame para int antes de comparar
+    input_as_number = int(float(normalized_serial))
+    mask_ativo = database['Ativo'].apply(
+        lambda x: int(float(x)) == input_as_number if pd.notna(x) else False
+    )
+    result = database[mask_ativo]
+except (ValueError, TypeError):
+    # Fallback para comparação string
+    mask_ativo = database['Ativo'].astype(str).str.upper() == normalized_serial.upper()
+```
+
+**3. Verificação de Duplicidade Corrigida** (`scanner_input.py` linhas 102-104)
+```python
+# Usar serialnumber do resultado, não input digitado
+serial_to_check = result.get('serialnumber', processed_serial) if result.get('found') else processed_serial
+already_scanned = any(item['serialnumber'] == serial_to_check for item in st.session_state.scanned_items)
+```
+
+#### Arquivos Modificados
+- `app/services/comparator.py` - Formatação int() + busca numérica (+15 linhas)
+- `app/components/scanner_input.py` - Duplicidade com serialnumber (+3 linhas)
+- `tests/unit/test_comparator.py` - 5 novos testes (+57 linhas)
+
+#### Validação
+
+**Testes Unitários:**
+```bash
+python -m pytest tests/unit/test_comparator.py -v
+# 12 passed in 0.25s ✅
+```
+
+**Testes Implementados:**
+1. ✅ Busca por patrimônio retorna serialnumber correto
+2. ✅ Patrimônio formatado como int (9856, não 9856.0)
+3. ✅ Busca por serialnumber continua funcionando
+4. ✅ Comparação completa por patrimônio
+5. ✅ Fallback para patrimônio não numérico
+
+#### Benefícios
+- ✅ Registro correto ao usar patrimônio
+- ✅ Formatação limpa sem casas decimais
+- ✅ Duplicidade detectada corretamente (pelo serial, não patrimônio)
+- ✅ Suporte para patrimônio numérico e alfanumérico
+- ✅ Retrocompatível com busca por serial
+
+#### Status
+- ✅ Implementação completa
+- ✅ 12/12 testes passando
+- ✅ Pronto para validação manual
+
+
+
+

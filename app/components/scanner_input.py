@@ -97,11 +97,13 @@ def render_scanner_input():
                 result['timestamp'] = datetime.now(ZoneInfo("America/Sao_Paulo"))
                 
                 # Verifica duplicidade na sessão atual
-                # Se já estiver na lista desta sessão, avisar e NÃO registrar novamente
-                already_scanned = any(item['serialnumber'] == processed_serial for item in st.session_state.scanned_items)
+                # IMPORTANTE: Usar serialnumber do resultado, não o input digitado
+                # Se buscar por patrimônio 9856, deve verificar duplicidade pelo serial JQHP813
+                serial_to_check = result.get('serialnumber', processed_serial) if result.get('found') else processed_serial
+                already_scanned = any(item['serialnumber'] == serial_to_check for item in st.session_state.scanned_items)
                 
                 if already_scanned:
-                     st.toast(f"⚠️ Item '{processed_serial}' já verificado nesta sessão!", icon="⚠️")
+                     st.toast(f"⚠️ Item '{serial_to_check}' já verificado nesta sessão!", icon="⚠️")
                      # Limpa o input e retorna SEM adicionar ao histórico
                      st.session_state.scanner_input = ""
                      return

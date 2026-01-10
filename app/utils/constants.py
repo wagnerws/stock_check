@@ -41,3 +41,24 @@ VALID_MIME_TYPES = [
 
 # Formato de nomenclatura para arquivos exportados
 EXPORT_FILENAME_PATTERN = "ajustes_lansweeper_{date}.xlsx"
+
+# Mapeamento de normalização PT-BR → EN
+# Permite que o Excel tenha estados em português
+STATE_NORMALIZATION = {
+    # Português → Inglês
+    'estoque': 'stock',
+    'quebrado': 'broken',
+    'roubado': 'stolen',
+    'em reparo': 'in repair',
+    'antigo': 'old',
+    'reservado': 'reserved',
+    'ativo': 'active',
+    # Inglês → Inglês (idempotência)
+    'stock': 'stock',
+    'broken': 'broken',
+    'stolen': 'stolen',
+    'in repair': 'in repair',
+    'old': 'old',
+    'reserved': 'reserved',
+    'active': 'active'
+}

@@ -81,3 +81,56 @@ def test_get_adjustment_list_columns(mock_database):
     
     for col in expected_cols:
         assert col in adj_list.columns
+
+
+# Testes para busca por patrimônio
+@pytest.fixture
+def database_with_patrimonio():
+    """Database de teste com coluna Ativo (patrimônio)"""
+    data = {
+        'Serialnumber': ['JQHP813', 'ABC123', 'XYZ789'],
+        'State': ['Stock', 'Active', 'Broken'],
+        'Name': ['NB-001', 'NB-002', 'NB-003'],
+        'lastuser': ['user1', 'user2', 'user3'],
+        'Ativo': [9856.0, 1234.0, 5678.0]  # Float como vem do Excel
+    }
+    return pd.DataFrame(data)
+
+
+def test_find_equipment_by_patrimonio_returns_serialnumber(database_with_patrimonio):
+    """Testa que busca por patrimônio retorna o serialnumber associado"""
+    result = find_equipment('9856', database_with_patrimonio)
+    
+    assert result is not None
+    assert result['serialnumber'] == 'JQHP813'
+    assert result['state'] == 'stock'
+    
+
+def test_find_equipment_patrimonio_formatted_as_int(database_with_patrimonio):
+    """Testa que patrimônio é formatado como inteiro (sem casas decimais)"""
+    result = find_equipment('9856', database_with_patrimonio)
+    
+    assert result is not None
+    assert result['ativo'] == 9856  # Int, não 9856.0
+    assert isinstance(result['ativo'], int)
+
+
+def test_find_equipment_by_serialnumber_still_works(database_with_patrimonio):
+    """Testa que busca por serial continua funcionando normalmente"""
+    result = find_equipment('JQHP813', database_with_patrimonio)
+    
+    assert result is not None
+    assert result['serialnumber'] == 'JQHP813'
+    assert result['ativo'] == 9856
+
+
+def test_compare_and_flag_by_patrimonio(database_with_patrimonio):
+    """Testa comparação completa ao buscar por patrimônio"""
+    result = compare_and_flag('1234', database_with_patrimonio)
+    
+    assert result['found'] is True
+    assert result['serialnumber'] == 'ABC123'  # Serial, não o patrimônio digitado
+    assert result['requires_adjustment'] is True
+    assert result['state'] == 'active'
+    assert result.get('ativo') == 1234
+
