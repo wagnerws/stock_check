@@ -164,20 +164,33 @@ def validate_serial_number(serial: str) -> bool:
 
 ## 🔄 Resume Point
 
-**Status Atual:** 🎉 Versão 0.3.0 - 5 Melhorias Implementadas
+**Status Atual:** 🎉 Versão 0.3.1 - Deploy Concluído
 
-**Última Sessão (10/01/2026):**
-Implementadas 5 melhorias críticas de tratamento de erros:
-1. ✅ Estado "Reservado" adicionado
-2. ✅ Prevenção de leituras duplicadas
-3. ✅ Timezone de Brasília configurado
-4. ✅ Suporte para busca por patrimônio (coluna Ativo)
-5. ✅ Modal de bloqueio para serials não encontrados
+**Última Sessão (10/01/2026 12:07):**
+Implementadas e deployadas 2 correções críticas:
+
+**1. Normalização de Estados PT-BR → EN:**
+- ✅ Mapeamento `STATE_NORMALIZATION` criado
+- ✅ Função `normalize_state()` implementada
+- ✅ Suporte completo para Excel em português e inglês
+- ✅ 6 testes passando
+
+**2. Registro por Patrimônio:**
+- ✅ Busca numérica corrigida (int comparison)
+- ✅ Formatação sem casas decimais (9856, não 9856.0)
+- ✅ Verificação de duplicidade usando serialnumber correto
+- ✅ 5 testes novos, 12 testes total passando
+
+**Deploy:**
+- ✅ Commit: 992ff92 (dev), 625e8a1 (main)
+- ✅ Push concluído para ambas as branches
+- ✅ 13 arquivos modificados, 609 inserções
 
 **Próximos Passos Recomendados:**
-1. **Testes em Ambiente Real** - Validar com leitor Zebra DS22
+1. **Validação em Produção** - Testar com leitor Zebra DS22 e Excel real
 2. **P3-002: Histórico de Verificações** - Persistência de dados entre sessões
 3. **P3-003: Modo Batch** - Upload de lista de serials para verificação automática
+
 
 **Tarefas do Backlog em Foco:**
 - ✅ **P1-001 a P1-005:** Todas concluídas
