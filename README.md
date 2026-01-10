@@ -8,11 +8,14 @@ O **Stock Check** é uma aplicação web desenvolvida em **Streamlit** que facil
 
 ### Funcionalidades Principais
 
-- 📥 **Upload de base Lansweeper** - Importação de arquivo Excel com dados dos equipamentos
-- 📷 **Leitura de códigos de barras** - Suporte a QR Code, Code 128 e entrada manual
+- 📥 **Upload de base Lansweeper** - Importação de arquivo Excel com validação completa de estrutura e dados
+- 📊 **Preview de Dados** - Visualização com estatísticas, gráficos de distribuição e primeiros registros
+- 📷 **Leitura de códigos de barras** - Suporte a QR Code, Code 128 e entrada manual (input direto)
 - 🔍 **Comparação em tempo real** - Verificação instantânea do serial vs base de dados
-- ⚠️ **Detecção de inconsistências** - Identifica equipamentos com estado "active" que deveriam estar em outro estado
-- 📤 **Exportação de relatórios** - Gera lista de itens que requerem ajuste manual no Lansweeper
+- ✅ **Validação automatizada** - Validação de estados, detecção de equipamentos ativos e verificação de colunas obrigatórias
+- ⚠️ **Detecção de inconsistências** - Identifica equipamentos com estado "active" mostrando hostname e usuário
+- 📈 **Relatórios completos** - Métricas de verificação, histórico de escaneamentos e estatísticas detalhadas
+- 📤 **Exportação de relatórios** - Gera lista de itens que requerem ajuste manual no Lansweeper com timestamp
 
 ---
 
@@ -129,29 +132,41 @@ pytest tests/integration/
 stock_check/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py                  # Entry point Streamlit
-│   ├── config.py                # Configurações da aplicação
-│   ├── components/              # Componentes UI
-│   │   ├── upload_component.py
-│   │   ├── scanner_component.py
-│   │   └── comparison_component.py
-│   ├── services/                # Lógica de negócio
-│   │   ├── excel_handler.py     # Importação/exportação Excel
-│   │   ├── validator.py         # Validação de estados
-│   │   └── comparator.py        # Comparação serial x base
-│   └── utils/                   # Utilitários
-│       ├── constants.py         # Estados válidos, configs
-│       └── helpers.py           # Funções auxiliares
+│   ├── main.py                      # Entry point Streamlit
+│   ├── config.py                    # Configurações da aplicação
+│   ├── components/                  # Componentes UI
+│   │   ├── upload_component.py      # Upload e preview de Excel
+│   │   ├── scanner_input.py         # Input de código de barras
+│   │   ├── comparison_component.py  # Comparação e exibição de resultados
+│   │   └── report_component.py      # Relatórios e métricas
+│   ├── services/                    # Lógica de negócio
+│   │   ├── excel_handler.py         # Importação/exportação Excel
+│   │   ├── barcode_handler.py       # Processamento de códigos de barras
+│   │   ├── validator.py             # Validação de estados e dados
+│   │   ├── comparator.py            # Comparação serial x base
+│   │   └── report_metrics.py        # Métricas e estatísticas
+│   └── utils/                       # Utilitários
+│       ├── constants.py             # Estados válidos, configs
+│       └── helpers.py               # Funções auxiliares
 ├── tests/
-│   ├── conftest.py              # Fixtures pytest
-│   ├── unit/                    # Testes unitários
-│   ├── integration/             # Testes de integração
-│   └── fixtures/                # Arquivos Excel de teste
-├── docs/                        # Documentação do projeto
-├── .env.example                 # Exemplo de variáveis de ambiente
+│   ├── conftest.py                  # Fixtures pytest
+│   ├── unit/                        # Testes unitários
+│   │   ├── test_excel_handler.py
+│   │   ├── test_validator.py
+│   │   ├── test_comparator.py
+│   │   └── test_report_metrics.py
+│   ├── integration/                 # Testes de integração
+│   └── fixtures/                    # Arquivos Excel de teste
+├── docs/                            # Documentação do projeto
+│   ├── backlog.md
+│   ├── config.md
+│   ├── historico.md
+│   ├── aprendizado.md
+│   └── persona.md
+├── .env.example                     # Exemplo de variáveis de ambiente
 ├── .gitignore
-├── requirements.txt             # Dependências Python
-└── README.md                    # Este arquivo
+├── requirements.txt                 # Dependências Python
+└── README.md                        # Este arquivo
 ```
 
 ---
@@ -189,15 +204,27 @@ LOG_LEVEL=INFO
 
 ## 📊 Status do Projeto
 
+### Progresso Geral: **50% Concluído** (7/14 tarefas)
+
 | Fase | Status |
 |------|--------|
-| ✅ Estrutura Base | Concluída |
-| 🚧 Módulo de Importação Excel | Em desenvolvimento |
-| 🚧 Interface de Upload | Planejada |
-| 🚧 Integração com Scanner | Planejada |
-| 🚧 Validação de Estados | Planejada |
-| 🚧 Comparação Serial x Base | Planejada |
-| 🚧 Exportação de Relatórios | Planejada |
+| ✅ **P1-001:** Decisão de Arquitetura | Concluída |
+| ✅ **P1-002:** Estrutura Base | Concluída |
+| ✅ **P1-003:** Módulo de Importação Excel | Concluída |
+| ✅ **P1-004:** Interface de Upload e Preview | Concluída |
+| ✅ **P1-005:** Integração com Scanner | Concluída |
+| ✅ **P2-001:** Validação de Estados | Concluída |
+| ✅ **P2-002:** Comparação Serial x Base | Concluída |
+| 🚧 **P2-003:** Interface de Verificação em Tempo Real | Em desenvolvimento |
+| 🚧 **P2-004:** Exportação para Excel | Planejada |
+| 🟡 **P3:** Funcionalidades Avançadas | Pendente |
+
+### Testes Implementados
+- ✅ 15 testes unitários para `excel_handler.py` (100% passando)
+- ✅ 7 testes unitários para `validator.py` (100% passando)
+- ✅ 9 testes unitários para `comparator.py` (100% passando)
+- ✅ 5 testes unitários para `report_metrics.py` (100% passando)
+- **Total:** 36 testes unitários | **Taxa de sucesso:** 100%
 
 ---
 
@@ -230,5 +257,6 @@ Este projeto é de uso interno.
 
 Desenvolvido com ❤️ para otimizar o controle de estoque físico.
 
-**Versão:** 0.1.0  
-**Última atualização:** 2026-01-08
+**Versão:** 0.2.0  
+**Última atualização:** 2026-01-10  
+**Progresso:** 50% (7/14 tarefas concluídas)
