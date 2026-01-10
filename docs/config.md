@@ -164,13 +164,24 @@ def validate_serial_number(serial: str) -> bool:
 
 ## 🔄 Resume Point
 
-**Status Atual:** Fase P3 (Prioridade 3) em Andamento 🚀
+**Status Atual:** 🎉 Versão 0.3.0 - 5 Melhorias Implementadas
 
-**Próximos Passos:**
-1. **P3-002: Histórico de Verificações** (Persistência de dados).
-2. **P3-003: Modo Batch** (Upload de lista de seriais).
+**Última Sessão (10/01/2026):**
+Implementadas 5 melhorias críticas de tratamento de erros:
+1. ✅ Estado "Reservado" adicionado
+2. ✅ Prevenção de leituras duplicadas
+3. ✅ Timezone de Brasília configurado
+4. ✅ Suporte para busca por patrimônio (coluna Ativo)
+5. ✅ Modal de bloqueio para serials não encontrados
+
+**Próximos Passos Recomendados:**
+1. **Testes em Ambiente Real** - Validar com leitor Zebra DS22
+2. **P3-002: Histórico de Verificações** - Persistência de dados entre sessões
+3. **P3-003: Modo Batch** - Upload de lista de serials para verificação automática
 
 **Tarefas do Backlog em Foco:**
+- ✅ **P1-001 a P1-005:** Todas concluídas
+- ✅ **P2-001 a P2-004:** Todas concluídas
 - ✅ **P3-001:** Relatórios e Estatísticas - **CONCLUÍDA**
 - 🟡 **P3-002:** Histórico de Verificações - **PRÓXIMA**
 
@@ -183,12 +194,15 @@ def validate_serial_number(serial: str) -> bool:
 - Usar `st.session_state` para manter dados entre interações
 - Implementar cache com `@st.cache_data` para operações pesadas
 - Validar arquivos antes de processar
+- Usar `@st.dialog` para modais de confirmação
+- Configurar timezone explícito para timestamps críticos
 
 ### Anti-Padrões a Evitar
 - ❌ Processar arquivos grandes sem progressbar
 - ❌ Não validar colunas do Excel antes de uso
 - ❌ Usar `st.write()` excessivamente (preferir componentes específicos)
+- ❌ Confiar no timezone do servidor (sempre usar timezone explícito)
 
 ---
 
-**Última Atualização:** 2026-01-08 23:45 BRT
+**Última Atualização:** 2026-01-10 10:11 BRT

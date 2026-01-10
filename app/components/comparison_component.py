@@ -48,6 +48,18 @@ def render_comparison_result(result: Dict[str, Any]):
             unsafe_allow_html=True
         )
         
+        # Display Patrimônio (Ativo) if available
+        if result.get('ativo'):
+            st.markdown(
+                f"""
+                <div style="text-align: center; margin: 5px 0;">
+                    <span style="font-size: 0.9rem; color: gray;">Patrimônio:</span>
+                    <span style="font-size: 1.2rem; font-weight: bold;">{result['ativo']}</span>
+                </div>
+                """,
+                unsafe_allow_html=True
+            )
+        
         if result['found']:
             # Details Section
             if result['requires_adjustment']:

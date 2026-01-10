@@ -51,6 +51,8 @@ def validate_excel_structure(df: pd.DataFrame) -> Tuple[bool, str]:
     Returns:
         Tupla (is_valid, error_message)
     """
+    from app.config import OPTIONAL_COLUMNS
+    
     if df is None or df.empty:
         return False, "Arquivo Excel está vazio"
     
@@ -63,6 +65,12 @@ def validate_excel_structure(df: pd.DataFrame) -> Tuple[bool, str]:
     # Check if there's at least one row
     if len(df) == 0:
         return False, "Arquivo Excel não contém nenhum registro"
+    
+    # Check for optional columns
+    optional_present = [col for col in OPTIONAL_COLUMNS if col in df.columns]
+    
+    if optional_present:
+        return True, f"✅ Arquivo válido. Colunas opcionais encontradas: {', '.join(optional_present)}"
     
     return True, ""
 

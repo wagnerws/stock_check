@@ -9,16 +9,34 @@ Responsabilidades:
 
 import pandas as pd
 from typing import Optional, Dict, Any
-from app.utils.constants import VALID_STATES, REQUIRES_ADJUSTMENT_STATE
+from app.utils.constants import VALID_STATES, REQUIRES_ADJUSTMENT_STATE, STATE_NORMALIZATION
 from app.utils.helpers import normalize_serial
+
+
+def normalize_state(state: str) -> str:
+    """
+    Normaliza o estado do equipamento para o padrão em inglês.
+    Suporta estados em PT-BR e EN.
+    
+    Args:
+        state: Estado do equipamento (pode ser PT-BR ou EN)
+        
+    Returns:
+        Estado normalizado em inglês minúsculo
+    """
+    if not state or not isinstance(state, str):
+        return 'unknown'
+    
+    state_lower = state.lower().strip()
+    return STATE_NORMALIZATION.get(state_lower, 'unknown')
 
 
 def find_equipment(serial: str, database: pd.DataFrame) -> Optional[Dict[str, Any]]:
     """
-    Busca equipamento na base de dados pelo número de série.
+    Busca equipamento na base de dados pelo número de série ou patrimônio.
     
     Args:
-        serial: Número de série a ser buscado
+        serial: Número de série ou patrimônio a ser buscado
         database: DataFrame com base de dados do Lansweeper
         
     Returns:
@@ -30,9 +48,25 @@ def find_equipment(serial: str, database: pd.DataFrame) -> Optional[Dict[str, An
     # Normalize serial for comparison
     normalized_serial = normalize_serial(serial)
     
-    # Search in database (case-insensitive)
+    # 1. Search by Serialnumber (prioridade 1)
     mask = database['Serialnumber'].str.upper() == normalized_serial.upper()
     result = database[mask]
+    
+    # 2. If not found and Ativo column exists, search by patrimônio (prioridade 2)
+    if result.empty and 'Ativo' in database.columns:
+        try:
+            # Tentar converter input para número (patrimônio pode ser numérico)
+            input_as_number = int(float(normalized_serial))
+            # Comparar como números (Ativo pode vir como float do Excel)
+            mask_ativo = database['Ativo'].apply(
+                lambda x: int(float(x)) == input_as_number if pd.notna(x) else False
+            )
+            result = database[mask_ativo]
+        except (ValueError, TypeError):
+            # Se não for número, tentar comparação como string (fallback)
+            mask_ativo = database['Ativo'].astype(str).str.upper() == normalized_serial.upper()
+            result = database[mask_ativo]
+    
     
     if result.empty:
         return None
@@ -42,9 +76,10 @@ def find_equipment(serial: str, database: pd.DataFrame) -> Optional[Dict[str, An
     
     return {
         'serialnumber': equipment['Serialnumber'],
-        'state': equipment['State'].lower() if pd.notna(equipment['State']) else 'unknown',
+        'state': normalize_state(equipment['State']) if pd.notna(equipment['State']) else 'unknown',
         'name': equipment['Name'] if pd.notna(equipment['Name']) else 'N/A',
-        'lastuser': equipment['lastuser'] if pd.notna(equipment['lastuser']) else 'N/A'
+        'lastuser': equipment['lastuser'] if pd.notna(equipment['lastuser']) else 'N/A',
+        'ativo': int(float(equipment['Ativo'])) if 'Ativo' in equipment and pd.notna(equipment['Ativo']) else None
     }
 
 
@@ -79,7 +114,7 @@ def compare_and_flag(serial: str, database: pd.DataFrame) -> Dict[str, Any]:
     # Determine emoji based on state
     if requires_adjustment:
         status_emoji = '⚠️'
-    elif state in ['stock', 'broken', 'stolen', 'in repair', 'old']:
+    elif state in ['stock', 'broken', 'stolen', 'in repair', 'old', 'reserved']:
         status_emoji = '✅'
     else:
         status_emoji = '❓'
@@ -92,6 +127,10 @@ def compare_and_flag(serial: str, database: pd.DataFrame) -> Dict[str, Any]:
         'status_emoji': status_emoji,
         'status_message': status_message
     }
+    
+    # Add ativo (patrimônio) if available
+    if equipment.get('ativo'):
+        result['ativo'] = equipment['ativo']
     
     # Add Name and lastuser only for active equipment
     if requires_adjustment:
