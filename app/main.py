@@ -30,7 +30,7 @@ def main():
 
     # Sidebar
     st.sidebar.title("📦 Stock Check")
-    st.sidebar.caption("v0.2.1")
+    st.sidebar.caption("v0.3.0")
     
     st.sidebar.divider()
     
@@ -53,6 +53,7 @@ def main():
         - 🚨 Stolen
         - ⚙️ In Repair
         - 📦 Old
+        - 🔖 Reserved
         """
     )
     

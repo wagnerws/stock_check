@@ -15,10 +15,10 @@ from app.utils.helpers import normalize_serial
 
 def find_equipment(serial: str, database: pd.DataFrame) -> Optional[Dict[str, Any]]:
     """
-    Busca equipamento na base de dados pelo número de série.
+    Busca equipamento na base de dados pelo número de série ou patrimônio.
     
     Args:
-        serial: Número de série a ser buscado
+        serial: Número de série ou patrimônio a ser buscado
         database: DataFrame com base de dados do Lansweeper
         
     Returns:
@@ -30,9 +30,14 @@ def find_equipment(serial: str, database: pd.DataFrame) -> Optional[Dict[str, An
     # Normalize serial for comparison
     normalized_serial = normalize_serial(serial)
     
-    # Search in database (case-insensitive)
+    # 1. Search by Serialnumber (prioridade 1)
     mask = database['Serialnumber'].str.upper() == normalized_serial.upper()
     result = database[mask]
+    
+    # 2. If not found and Ativo column exists, search by patrimônio (prioridade 2)
+    if result.empty and 'Ativo' in database.columns:
+        mask_ativo = database['Ativo'].astype(str).str.upper() == normalized_serial.upper()
+        result = database[mask_ativo]
     
     if result.empty:
         return None
@@ -44,7 +49,8 @@ def find_equipment(serial: str, database: pd.DataFrame) -> Optional[Dict[str, An
         'serialnumber': equipment['Serialnumber'],
         'state': equipment['State'].lower() if pd.notna(equipment['State']) else 'unknown',
         'name': equipment['Name'] if pd.notna(equipment['Name']) else 'N/A',
-        'lastuser': equipment['lastuser'] if pd.notna(equipment['lastuser']) else 'N/A'
+        'lastuser': equipment['lastuser'] if pd.notna(equipment['lastuser']) else 'N/A',
+        'ativo': equipment['Ativo'] if 'Ativo' in equipment and pd.notna(equipment['Ativo']) else None
     }
 
 
@@ -92,6 +98,10 @@ def compare_and_flag(serial: str, database: pd.DataFrame) -> Dict[str, Any]:
         'status_emoji': status_emoji,
         'status_message': status_message
     }
+    
+    # Add ativo (patrimônio) if available
+    if equipment.get('ativo'):
+        result['ativo'] = equipment['ativo']
     
     # Add Name and lastuser only for active equipment
     if requires_adjustment:

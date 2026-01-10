@@ -19,6 +19,9 @@ MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 # Colunas obrigatórias do Excel do Lansweeper
 REQUIRED_COLUMNS = ["Serialnumber", "State", "Name", "lastuser"]
 
+# Colunas opcionais (podem ou não estar presentes)
+OPTIONAL_COLUMNS = ["Ativo"]
+
 # Debug mode
 DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 

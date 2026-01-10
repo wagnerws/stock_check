@@ -9,6 +9,7 @@ VALID_STATES = {
     'stolen': '🚨 Roubado - OK',
     'in repair': '⚙️ Em reparo - OK',
     'old': '📦 Equipamento antigo - OK',
+    'reserved': '🔖 Reservado - OK',
     'active': '⚠️ ATIVO - Requer ajuste no Lansweeper'
 }
 
@@ -19,11 +20,12 @@ STATE_EMOJI = {
     'stolen': '🚨',
     'in repair': '⚙️',
     'old': '📦',
+    'reserved': '🔖',
     'active': '⚠️'
 }
 
 # Lista de estados que NÃO requerem ajuste manual
-OK_STATES = ['stock', 'broken', 'stolen', 'in repair', 'old']
+OK_STATES = ['stock', 'broken', 'stolen', 'in repair', 'old', 'reserved']
 
 # Estado que requer ajuste no Lansweeper
 REQUIRES_ADJUSTMENT_STATE = 'active'
