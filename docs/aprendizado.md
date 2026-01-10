@@ -432,3 +432,78 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 **Lição:**
 Sempre garantir que o `sys.path` esteja corretamente configurado para scripts de entrada que são executados a partir de subdiretórios, especialmente em ambientes de nuvem gerenciados.
+
+---
+
+#### 🔒 Modais de Bloqueio com `@st.dialog` (10/01/2026)
+
+**Contexto:**
+Implementação de modal de confirmação quando serial não é encontrado, bloqueando próximas leituras até decisão do usuário.
+
+**Aprendizado:**
+- Decorator `@st.dialog("Título")` cria modais nativos do Streamlit
+- Modais aparecem automaticamente quando a função decorada é chamada
+- Para bloquear input durante modal:
+  - Usar `st.session_state.blocked_scan` como flag
+  - Criar input desabilitado com `disabled=True` quando bloqueado
+  - Usar `st.stop()` para interromper renderização após modal
+- `st.rerun()` força reload para exibir modal imediatamente
+
+**Código Exemplo:**
+```python
+@st.dialog("⚠️ Atenção")
+def show_confirmation():
+    st.warning("Mensagem de aviso")
+    if st.button("Confirmar"):
+        st.session_state.confirmed = True
+        st.rerun()
+
+if st.session_state.get('needs_confirmation'):
+    show_confirmation()
+    st.text_input("Input", disabled=True)
+    st.stop()
+```
+
+---
+
+#### 🌍 Timezone em Python com zoneinfo (10/01/2026)
+
+**Contexto:**
+Necessidade de garantir timestamps no horário de Brasília, não do servidor.
+
+**Aprendizado:**
+- Python 3.9+ inclui `zoneinfo` na biblioteca padrão
+- Para timezone específico: `datetime.now(ZoneInfo("America/Sao_Paulo"))`
+- Timezone de Brasília: "America/Sao_Paulo" (não "BRT" ou "Brazil/East")
+- Alternativa para Python < 3.9: biblioteca `pytz`
+
+**Aplicação:**
+Sempre usar timezone explícito quando horário local é crítico, especialmente em aplicações cloud onde servidor pode estar em timezone diferente.
+
+---
+
+#### 🔍 Busca com Fallback em DataFrames (10/01/2026)
+
+**Contexto:**
+Implementação de busca por número de patrimônio como alternativa ao serial.
+
+**Aprendizado:**
+Estratégia de busca com múltiplas prioridades em pandas:
+```python
+# Prioridade 1: Busca principal
+mask1 = df['coluna1'].str.upper() == valor.upper()
+result = df[mask1]
+
+# Prioridade 2: Fallback se vazio
+if result.empty and 'coluna2' in df.columns:
+    mask2 = df['coluna2'].astype(str).str.upper() == valor.upper()
+    result = df[mask2]
+```
+
+**Benefício:**
+Permite flexibilidade na entrada de dados sem comprometer performance ou complexidade do código.
+
+---
+
+**Última Atualização:** 10/01/2026 - 10:11 BRT
+
