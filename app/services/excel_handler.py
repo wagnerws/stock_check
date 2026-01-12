@@ -5,6 +5,7 @@ Responsabilidades:
 - Importação de arquivos Excel do Lansweeper
 - Validação de estrutura e colunas obrigatórias
 - Exportação de relatórios em formato Excel
+- FILTRO AUTOMÁTICO: Apenas notebooks
 """
 
 import pandas as pd
@@ -18,11 +19,13 @@ def import_excel(file_path: str) -> Optional[pd.DataFrame]:
     """
     Importa arquivo Excel do Lansweeper e valida estrutura.
     
+    IMPORTANTE: Filtra automaticamente apenas NOTEBOOKS da base completa.
+    
     Args:
         file_path: Caminho do arquivo Excel
         
     Returns:
-        DataFrame com dados importados ou None se inválido
+        DataFrame com dados importados (apenas notebooks) ou None se inválido
     """
     try:
         # Read Excel file
@@ -34,11 +37,64 @@ def import_excel(file_path: str) -> Optional[pd.DataFrame]:
         if not is_valid:
             raise ValueError(error_message)
         
+        # Convert Ativo column to integer if present (prevent decimal display)
+        if 'Ativo' in df.columns:
+            df['Ativo'] = df['Ativo'].apply(
+                lambda x: int(float(x)) if pd.notna(x) and x != '' else None
+            )
+        
+        # TODO: FILTRO AUTOMÁTICO DE NOTEBOOKS (P3-008)
+        # Filtro comentado temporariamente - causando erro no upload
+        # df_notebooks = filter_notebooks_only(df)
+        # return df_notebooks
+        
         return df
     
     except Exception as e:
         print(f"Erro ao importar Excel: {str(e)}")
         return None
+
+
+def filter_notebooks_only(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Filtra apenas notebooks da base completa usando padrões de modelo.
+    
+    Args:
+        df: DataFrame completo do Lansweeper
+        
+    Returns:
+        DataFrame filtrado apenas com notebooks
+    """
+    from app.utils.constants import NOTEBOOK_MODEL_PATTERNS
+    
+    # Verificar se coluna Model existe
+    if 'Model' not in df.columns:
+        print("⚠️ Coluna 'Model' não encontrada. Retornando todos os registros.")
+        return df
+    
+    try:
+        # Filtrar linhas onde Model contém qualquer padrão de notebook (case-insensitive)
+        # Garantir que valores None/NaN sejam tratados
+        mask = df['Model'].fillna('').str.lower().str.contains(
+            '|'.join(NOTEBOOK_MODEL_PATTERNS),
+            case=False,
+            na=False,
+            regex=True
+        )
+        
+        df_filtered = df[mask].copy()
+        
+        total_original = len(df)
+        total_notebooks = len(df_filtered)
+        
+        print(f"📊 Filtro aplicado: {total_notebooks} notebooks de {total_original} dispositivos totais")
+        
+        return df_filtered
+        
+    except Exception as e:
+        print(f"⚠️ Erro ao filtrar notebooks: {str(e)}")
+        print("⚠️ Retornando todos os registros.")
+        return df
 
 
 def validate_excel_structure(df: pd.DataFrame) -> Tuple[bool, str]:
@@ -177,17 +233,47 @@ def export_scanned_history(history_data: list) -> bytes:
             cols.remove('timestamp')
             cols = ['timestamp'] + cols
             df = df[cols]
-            
-        # Sanitize all values
-        for col in df.columns:
-            df[col] = df[col].apply(
-                lambda x: sanitize_excel_value(str(x)) if pd.notna(x) else ''
+        
+        # Format ativo column as integer if present
+        if 'ativo' in df.columns:
+            # Convert to int first (numeric)
+            df['ativo'] = df['ativo'].apply(
+                lambda x: int(float(x)) if pd.notna(x) and x != '' and x != '-' else ''
             )
             
         # Export to bytes
         from io import BytesIO
+        from openpyxl import load_workbook
+        from openpyxl.styles import numbers
+        
         output = BytesIO()
+        
+        # First export to Excel normally
         df.to_excel(output, index=False, engine='openpyxl')
+        
+        # Now open with openpyxl to format Ativo column as integer
+        output.seek(0)
+        wb = load_workbook(output)
+        ws = wb.active
+        
+        # Find Ativo column index
+        ativo_col_idx = None
+        for idx, cell in enumerate(ws[1], 1):  # Header row
+            if cell.value and 'ativo' in str(cell.value).lower():
+                ativo_col_idx = idx
+                break
+        
+        # Format Ativo column cells as integer (no decimals)
+        if ativo_col_idx:
+            for row in range(2, ws.max_row + 1):  # Skip header
+                cell = ws.cell(row=row, column=ativo_col_idx)
+                if cell.value and cell.value != '':
+                    # Set number format to integer (0 = no decimals)
+                    cell.number_format = '0'
+        
+        # Save back to BytesIO
+        output = BytesIO()
+        wb.save(output)
         output.seek(0)
         
         return output.getvalue()

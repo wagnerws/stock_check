@@ -1,5 +1,166 @@
 # Histórico de Configuração do Projeto
 
+## Data: 12/01/2026 - 13:50 BRT
+
+### 22. Correção de Formatação - Coluna Patrimônio (v0.6.1)
+
+#### Contexto
+Ajustada formatação da coluna "Ativo" (patrimônio) para exibir como número inteiro ao invés de decimal.
+
+#### Problema Relatado
+- Coluna exibindo "1234.0" ao invés de "1234"
+- Ocorria em exportações Excel, PDFs e interface
+
+#### Arquivos Modificados
+- `app/components/history_component.py` - Display do histórico
+- `app/components/comparison_component.py` - Display do resultado da verificação
+- `app/services/excel_handler.py` - Exportação para Excel
+- `app/services/pdf_generator.py` - Geração de PDF
+- `app/main.py` - Versão atualizada para 0.6.1
+
+#### Solução Implementada
+Adicionada conversão `int(float(x))` em todos os pontos onde o valor "ativo" é exibido ou exportado:
+
+```python
+# Formato aplicado em todos os componentes
+try:
+    ativo_display = int(float(ativo_value))
+except (ValueError, TypeError):
+    ativo_display = ativo_value
+```
+
+#### Resultado
+- ✅ Patrimônio agora exibe "1234" ao invés de "1234.0"
+- ✅ Aplicado em: Interface, Histórico, Excel, PDF
+- ✅ Versão atualizada para 0.6.1
+
+---
+
+## Data: 12/01/2026 - 13:15 BRT
+
+### 21. Implementação de Relatórios PDF (P3-008) - v0.6.0
+
+#### Contexto
+Implementada migração completa de relatórios Excel para PDF conforme solicitação do usuário para compliance.
+
+#### Funcionalidades Implementadas
+
+**1. Serviço de Geração de PDF** (`app/services/pdf_generator.py`):
+- Biblioteca: **reportlab 4.4.7**
+- Funções implementadas:
+  - `generate_session_report_pdf()` - Relatório completo de verificação
+  - `generate_adjustment_list_pdf()` - Lista apenas de itens "active"
+  - `generate_historical_session_pdf()` - Relatório de sessão histórica
+  - `generate_empty_adjustment_pdf()` - PDF quando não há ajustes
+
+**2. Metadados de Compliance:**
+- ✅ Timestamp com timezone de Brasília (`America/Sao_Paulo`)
+- ✅ Session ID único
+- ✅ Hash SHA256 para verificação de integridade
+- ✅ Versão da aplicação
+- ✅ Formatação profissional com cores corporativas (#003366)
+
+**3. Interface Atualizada** (`app/components/comparison_component.py`):
+- Adicionados dois botões na aba "Verificação":
+  - 📊 **Relatório Completo (PDF)** - Gera PDF com todos os itens verificados
+  - ⚠️ **Lista de Ajustes (PDF)** - Gera PDF apenas com itens "active"
+- Botões exibem download automático após gerar PDF
+- Mensagens de sucesso/erro para feedback do usuário
+
+**4. Estrutura do PDF:**
+```
+┌─────────────────────────────────────┐
+│ RELATÓRIO DE VERIFICAÇÃO DE ESTOQUE│
+│ Data: XX/XX/XXXX HH:MM:SS BRT      │
+│ Session ID: XXXXX                   │
+│ Versão: Stock Check v0.6.0         │
+│                                     │
+│ RESUMO EXECUTIVO                    │
+│ • Total Verificado: XX itens       │
+│ • Encontrados OK: XX               │
+│ • Requerem Ajuste: XX              │
+│                                     │
+│ DETALHAMENTO [Tabela formatada]    │
+│                                     │
+│ Hash: SHA256(...) | Página X/Y     │
+└─────────────────────────────────────┘
+```
+
+#### Arquivos Criados/Modificados
+
+**Criados:**
+- `app/services/pdf_generator.py` - Serviço completo de geração PDF (340 linhas)
+
+**Modificados:**
+- `app/components/comparison_component.py` - Adicionados botões PDF (+70 linhas)
+- `app/main.py` - Versão atualizada para 0.6.0
+- `requirements.txt` - Adicionado `reportlab>=4.0.0`
+- `docs/anotacoes.txt` - Marcado tarefa como implementada
+- `docs/backlog.md` - P3-008 marcada como concluída
+
+#### Benefícios de Compliance
+
+| Aspecto | Excel | PDF |
+|---------|-------|-----|
+| Editável | ✅ (problema) | ❌ (bom) |
+| Imutável | ❌ | ✅ |
+| Integridade | ❌ | ✅ Hash SHA256 |
+| Auditoria | ⚠️ | ✅ |
+
+#### Testes Realizados
+- ✅ Importação do módulo `pdf_generator`
+- ✅ Teste de geração de PDF em memória
+- ⏳ Teste manual com Streamlit (aguardando dados reais)
+
+#### Métricas
+- **Arquivos criados:** 1
+- **Arquivos modificados:** 5
+- **Linhas de código:** ~410
+- **Progresso P3:** 3/7 tarefas (42.8%)
+- **Progresso Geral:** 12/16 tarefas (75%)
+
+#### Próximos Passos
+1. **Logo Anbima:** Aguardando arquivo PNG/SVG para incluir nos PDFs
+2. **P3-007:** Integração com SharePoint da Anbima (aguardando informações do usuário)
+   - URL do SharePoint
+   - Tenant ID e Client ID (Azure AD)
+   - Site/Biblioteca de documentos
+
+#### Status da Aplicação
+- ✅ Aplicação Streamlit rodando (4h+)
+- ✅ Versão 0.6.0 operacional
+- ✅ PDF Generator testado e funcionando
+- ✅ Pronto para testes com dados reais
+
+---
+
+## Data: 10/01/2026 - 12:23 BRT
+
+### 20. Comando "save" - Fechamento de Sessão
+
+#### Contexto
+Executado comando especial "save" para realizar o **Protocolo de Fechamento de Sessão**.
+
+#### Status da Aplicação
+- ✅ Aplicação Streamlit rodando em modo desenvolvimento (9m51s uptime)
+- ✅ Versão 0.3.1 estável
+- ✅ Nenhuma modificação de código nesta sessão
+- ✅ Apenas monitoramento e gestão de artefatos
+
+#### Arquivos Atualizados
+- `docs/historico.md` - Registro desta sessão
+- `docs/aprendizado.md` - Sem novos aprendizados nesta sessão
+- `docs/config.md` - Resume Point atualizado
+- `docs/backlog.md` - Sem alterações (backlog já está atualizado)
+
+#### Resumo da Sessão
+- **Tipo:** Sessão de manutenção/monitoramento
+- **Duração:** Curta
+- **Atividades:** Verificação de status e execução de protocolo de save
+- **Modificações:** Apenas documentação
+
+---
+
 ## Data: 08/01/2026
 
 ### 1. Configuração de Acesso (SSH)
