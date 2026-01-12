@@ -1,5 +1,92 @@
 # Histórico de Configuração do Projeto
 
+## Data: 12/01/2026 - 16:25 BRT
+
+### 23. Deploy v0.6.3 para Produção 🚀
+
+#### Contexto
+Realizado commit e push da versão v0.6.3 para produção no Streamlit Cloud.
+
+#### Alterações Incluídas no Release
+
+**Features Principais:**
+- ✅ **PDF Report Generation** - Relatórios em PDF com reportlab
+  - Relatório completo de verificação
+  - Lista de ajustes necessários
+  - Relatório de sessão histórica
+- ✅ **Compliance Metadata**
+  - Hash SHA256 para integridade
+  - Timestamp com timezone Brasília
+  - Session ID único
+  - Versão da aplicação
+
+**Correções (v0.6.1 → v0.6.3):**
+- ✅ Coluna "Ativo" agora exibe como inteiro (1234 ao invés de 1234.0)
+- ✅ Aplicado em: Interface, Histórico, Excel, PDF
+- ✅ Excel formatado com openpyxl number_format = '0'
+- ✅ Conversão int(float()) na importação do DataFrame
+
+#### Arquivos Modificados (25 objetos, 19.18 KiB)
+
+**Novos:**
+- `app/services/pdf_generator.py` - Serviço de geração de PDF
+
+**Modificados:**
+- `app/main.py` - Versão 0.6.3
+- `app/components/comparison_component.py` - Botões PDF + formatação ativo
+- `app/components/history_component.py` - Formatação ativo
+- `app/components/upload_component.py` - Preview formatado
+- `app/services/excel_handler.py` - Conversão ativo + formatação Excel
+- `app/services/comparator.py` - Já convertia para int
+- `requirements.txt` - Adicionado reportlab>=4.0.0
+- `docs/historico.md` - Documentação completa
+- `docs/backlog.md` - P3-008 marcada como completa
+- `docs/anotacoes.txt` - Tarefa implementada
+
+#### Git Commit
+
+```bash
+Commit: 9ee0986
+Branch: dev
+Remote: github.com:wagnerws/stock_check.git
+Message: Release v0.6.3 - PDF Reports + Patrimonio Integer Fix
+```
+
+**Objetos enviados:**
+- Total: 25 objetos
+- Comprimidos: 24/24
+- Delta: 12/12
+- Tamanho: 19.18 KiB
+
+#### Deploy Automático
+
+**URL Produção:** https://check-stock.streamlit.app/
+
+Streamlit Cloud detectará automaticamente o push e fará redeploy em ~2-3 minutos.
+
+#### Status Final
+
+**Versão em Produção:** v0.6.3  
+**Progresso Geral:** 12/16 tarefas (75%)
+
+**Funcionalidades Ativas:**
+- ✅ Upload e validação de base Lansweeper
+- ✅ Verificação física item a item (scanner/manual)
+- ✅ Comparação e validação de estados
+- ✅ Histórico de sessões de verificação
+- ✅ **Relatórios em PDF com compliance**
+- ✅ Exportação Excel formatada
+- ✅ Estatísticas e métricas em tempo real
+
+**Em Standby:**
+- ⏸️ P3-007: SharePoint Integration (aguardando App Registration da TI)
+
+**Não Aplicável:**
+- ❌ P3-003: Modo Batch (não se aplica a verificação física)
+- ❌ P3-005: Dockerização (já deployado em Streamlit Cloud)
+
+---
+
 ## Data: 12/01/2026 - 13:50 BRT
 
 ### 22. Correção de Formatação - Coluna Patrimônio (v0.6.1)

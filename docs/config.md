@@ -220,4 +220,98 @@ Sessão de manutenção com execução do comando "save" para fechamento de sess
 
 ---
 
-**Última Atualização:** 2026-01-10 12:23 BRT
+## 🔄 Resume Point
+
+**Última Sessão:** 12/01/2026 16:37 BRT  
+**Versão Atual:** v0.6.3  
+**Status:** ✅ Deploy em produção concluído
+
+### O Que Foi Feito Hoje
+
+**Implementações:**
+1. ✅ **P3-008: Relatórios em PDF**
+   - Serviço `pdf_generator.py` com reportlab
+   - Três tipos de relatórios (completo, ajustes, histórico)
+   - Compliance: SHA256, timestamp, session ID
+   - Botões de export na interface
+
+2. ✅ **Correção Patrimônio (v0.6.1 → v0.6.3)**
+   - Coluna "Ativo" formatada como inteiro
+   - Aplicado em: Interface, Histórico, Excel, PDF
+   - Solução: openpyxl number_format + conversão na importação
+
+3. ✅ **Deploy para Produção**
+   - Commit `9ee0986` enviado para GitHub (dev)
+   - 25 objetos (19.18 KiB)
+   - Streamlit Cloud auto-deploy iniciado
+   - URL: https://check-stock.streamlit.app/
+
+### Status Atual do Projeto
+
+**Progresso:** 12/16 tarefas (75%)
+
+**✅ Completas:**
+- P1: 5/5 (Funcionalidades críticas)
+- P2: 4/4 (Funcionalidades importantes)
+- P3-001: Relatórios e Estatísticas
+- P3-002: Histórico de Verificações
+- P3-008: Relatórios em PDF
+
+**⏸️ Em Standby:**
+- P3-007: SharePoint Integration
+  - Aguardando: App Registration Azure AD (TI)
+  - Biblioteca destino: Infraestrutura e Ciber > Field > Suporte > Instruções de Trabalho > Estoque Periféricos e Ativos > Controle de estoque - 2026
+
+**❌ Não Aplicável:**
+- P3-003: Modo Batch (incompatível com verificação física)
+- P3-005: Dockerização (já em Streamlit Cloud)
+
+**📋 Opcional Restante:**
+- P3-004: Testes Automatizados Expandidos
+
+### Próximos Passos
+
+**Imediato:**
+1. Aguardar conclusão do deploy no Streamlit Cloud (~2-3 min)
+2. Validar v0.6.3 em produção
+3. Testar geração de PDFs com dados reais
+
+**Curto Prazo:**
+- Aguardar TI liberar Azure AD App Registration para SharePoint
+- Quando disponível: implementar P3-007
+
+**Opcional:**
+- Implementar melhorias UX (atalhos, sons, estatísticas)
+- Expandir testes automatizados
+
+### Informações Importantes
+
+**Logo Anbima:** ✅ Disponível (assets)  
+**URL Produção:** https://check-stock.streamlit.app/  
+**SharePoint Anbima:** https://anbima.sharepoint.com (Site: Tecnologia)  
+**Repositório:** github.com:wagnerws/stock_check.git (branch: dev)
+
+---
+
+## 📚 Lessons Learned
+
+### Boas Práticas
+- Usar `st.session_state` para manter dados entre interações
+- Implementar cache com `@st.cache_data` para operações pesadas
+- Validar arquivos antes de processar
+- Usar `@st.dialog` para modais de confirmação
+- Configurar timezone explícito para timestamps críticos
+- **Formatar células Excel com openpyxl após exportação**
+- **Converter dados numéricos na importação do DataFrame**
+
+### Anti-Padrões a Evitar
+- ❌ Processar arquivos grandes sem progressbar
+- ❌ Não validar colunas do Excel antes de uso
+- ❌ Usar `st.write()` excessivamente (preferir componentes específicos)
+- ❌ Confiar no timezone do servidor (sempre usar timezone explícito)
+- ❌ **Confiar apenas em conversão Python para formatar Excel**
+- ❌ **Esquecer que Excel tem formatação própria de células**
+
+---
+
+**Última Atualização:** 2026-01-12 16:37 BRT
