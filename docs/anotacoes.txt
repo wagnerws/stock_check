@@ -5,3 +5,6 @@ ideias que surgem durante o desenvolvimento
   - Lista de ajustes necessários (apenas itens "active")
   - Hash SHA256 para integridade
   - Metadados de compliance (timestamp, session ID)
+
+
+  mostrar modelos das maquinas e
