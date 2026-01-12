@@ -171,13 +171,21 @@
 ---
 
 ### P3-002: Histórico de Verificações
-**Status:** 🟡 Pendente  
+**Status:** ✅ Concluída  
+**Data Conclusão:** 10/01/2026  
 **Dependências:** P2-002  
 **Complexidade:** Média  
 **Descrição:**
 - Salvar histórico de verificações realizadas
 - Consultar verificações anteriores
 - Comparar múltiplas verificações ao longo do tempo
+
+**Resultados:**
+- ✅ Sistema de histórico com storage local JSON
+- ✅ Nova aba "📜 Histórico" na aplicação
+- ✅ Auto-save após cada scan
+- ✅ Bloqueio de compliance (acesso apenas após upload base)
+- ✅ Listagem, visualização, exportação e deleção de sessões
 
 ---
 
@@ -215,18 +223,78 @@
 
 ---
 
+### P3-007: Integração com SharePoint da Anbima
+**Status:** 🟡 Pendente  
+**Dependências:** P3-002  
+**Complexidade:** Alta  
+**Descrição:**
+- Implementar OAuth Device Code Flow para autenticação Azure AD
+- Upload automático de relatórios PDF para SharePoint
+- Download e listagem de sessões históricas do SharePoint
+- Sincronização bidirecional (local ↔ SharePoint)
+- Sistema de fallback offline (storage local quando SharePoint indisponível)
+- Estrutura de pastas por ano/mês no SharePoint
+- Log de auditoria para compliance
+
+**Informações Necessárias:**
+- URL do SharePoint da Anbima
+- Site/Biblioteca de documentos alvo
+- Tenant ID e Client ID (Azure AD App Registration)
+- Permissões de acesso ao SharePoint
+
+---
+
+### P3-008: Migração de Relatórios Excel para PDF
+**Status:** ✅ Concluída  
+**Data Conclusão:** 12/01/2026  
+**Dependências:** P2-004  
+**Complexidade:** Média  
+**Descrição:**
+- Implementar geração de PDF com reportlab ou weasyprint
+- Template profissional com logo Anbima
+- Três tipos de relatório:
+  1. Relatório de Verificação Completa (sessão atual)
+  2. Lista de Ajustes Necessários (itens "active")
+  3. Relatório de Sessão Histórica
+- Metadados de compliance (timestamp, session ID, usuário, hash SHA256)
+- Substituir todos os exports Excel por PDF
+- Botões de download atualizados na UI
+
+**Resultados:**
+- ✅ Serviço `pdf_generator.py` criado com reportlab 4.4.7
+- ✅ Três tipos de relatório implementados
+- ✅ Hash SHA256 para verificação de integridade
+- ✅ Metadados completos (timestamp Brasília, session ID, versão)
+- ✅ Botões PDF na aba Verificação
+- ✅ Estilização profissional com cores corporativas #003366
+- ✅ Versão atualizada para 0.6.0
+
+**Benefícios de Compliance:**
+- Documentos imutáveis (não editáveis como Excel)
+- Hash SHA256 para verificação de integridade
+- Metadados rastreáveis
+- Formato apropriado para auditoria
+
+---
+
 ## 📊 Resumo de Prioridades
 
 | Prioridade | Tarefas | Status |
 |------------|---------|--------|
 | P1 (Crítico) | 5 | ✅ 5/5 |
-| P2 (Importante) | 4 | ✅ 2/4 |
-| P3 (Desejável) | 5 | 🟡 0/5 |
-| **TOTAL** | **14** | **7/14 (50%)** |
+| P2 (Importante) | 4 | ✅ 4/4 |
+| P3 (Desejável) | 7 | ✅ 3/7 |
+| **TOTAL** | **16** | **12/16 (75%)** |
 
 ---
 
 ## 🎯 Próxima Tarefa Recomendada
-**P2-004: Exportação para Excel**
+**P3-007: Integração com SharePoint da Anbima**
 
-Gerar arquivo Excel com itens que requerem ajuste (estado "active"), incluindo serial, hostname e usuário.
+Implementar OAuth Device Code Flow e upload automático de PDFs para SharePoint, com sistema de fallback offline.
+
+**Aguardando informações do usuário:**
+- URL do SharePoint da Anbima
+- Tenant ID e Client ID (Azure AD App Registration)
+- Site/Biblioteca de documentos alvo
+- Logo Anbima (PNG/SVG)

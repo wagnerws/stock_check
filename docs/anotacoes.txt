@@ -1,5 +1,10 @@
 ideias que surgem durante o desenvolvimento
 
--pendentes
+- ✅ o relatorio deve ser em pdf não em excel (IMPLEMENTADO v0.6.0)
+  - Relatório completo com todas verificações
+  - Lista de ajustes necessários (apenas itens "active")
+  - Hash SHA256 para integridade
+  - Metadados de compliance (timestamp, session ID)
 
 
+  mostrar modelos das maquinas e

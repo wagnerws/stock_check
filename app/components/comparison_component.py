@@ -50,11 +50,17 @@ def render_comparison_result(result: Dict[str, Any]):
         
         # Display Patrimônio (Ativo) if available
         if result.get('ativo'):
+            # Format as integer without decimals
+            try:
+                ativo_display = int(float(result['ativo']))
+            except (ValueError, TypeError):
+                ativo_display = result['ativo']
+            
             st.markdown(
                 f"""
                 <div style="text-align: center; margin: 5px 0;">
                     <span style="font-size: 0.9rem; color: gray;">Patrimônio:</span>
-                    <span style="font-size: 1.2rem; font-weight: bold;">{result['ativo']}</span>
+                    <span style="font-size: 1.2rem; font-weight: bold;">{ativo_display}</span>
                 </div>
                 """,
                 unsafe_allow_html=True
@@ -113,6 +119,76 @@ def render_session_metrics():
     m2.metric("✅ Em Ordem", total_ok)
     m3.metric("⚠️ Ajustar (Active)", total_adj, delta_color="inverse")
     
+    # PDF Export Buttons
+    if total > 0:
+        st.markdown("### 📄 Gerar Relatórios PDF")
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("📊 Relatório Completo (PDF)", use_container_width=True, type="primary"):
+                try:
+                    from app.services.pdf_generator import generate_session_report_pdf
+                    from datetime import datetime
+                    from zoneinfo import ZoneInfo
+                    import pandas as pd
+                    
+                    session_data = {
+                        'session_id': st.session_state.get('session_id', 'current'),
+                        'timestamp': datetime.now(ZoneInfo("America/Sao_Paulo"))
+                    }
+                    
+                    pdf_bytes = generate_session_report_pdf(
+                        session_data=session_data,
+                        scanned_items=st.session_state.scanned_items,
+                        dataframe=st.session_state.get('dataframe', pd.DataFrame()),
+                        format_type="complete"
+                    )
+                    
+                    filename = f"verificacao_completa_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+                    
+                    st.download_button(
+                        label="⬇️ Baixar Relatório Completo",
+                        data=pdf_bytes,
+                        file_name=filename,
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
+                    
+                    st.success("✅ Relatório gerado com sucesso!")
+                    
+                except Exception as e:
+                    st.error(f"❌ Erro ao gerar PDF: {str(e)}")
+        
+        with col2:
+            if total_adj > 0:
+                if st.button("⚠️ Lista de Ajustes (PDF)", use_container_width=True, type="secondary"):
+                    try:
+                        from app.services.pdf_generator import generate_adjustment_list_pdf
+                        from datetime import datetime
+                        
+                        session_id = st.session_state.get('session_id', 'current')
+                        pdf_bytes = generate_adjustment_list_pdf(
+                            scanned_items=st.session_state.scanned_items,
+                            session_id=session_id
+                        )
+                        
+                        filename = f"ajustes_lansweeper_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+                        
+                        st.download_button(
+                            label="⬇️ Baixar Lista de Ajustes",
+                            data=pdf_bytes,
+                            file_name=filename,
+                            mime="application/pdf",
+                            use_container_width=True
+                        )
+                        
+                        st.success(f"✅ Lista com {total_adj} item(ns) gerada!")
+                        
+                    except Exception as e:
+                        st.error(f"❌ Erro ao gerar PDF: {str(e)}")
+            else:
+                st.info("✅ Nenhum item requer ajuste!")
+    
     st.divider()
 
 
@@ -162,3 +238,4 @@ def render_comparison_component():
         )
     else:
         st.info("💡 Bipe um equipamento para começar.")
+

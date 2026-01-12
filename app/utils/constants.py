@@ -62,3 +62,16 @@ STATE_NORMALIZATION = {
     'reserved': 'reserved',
     'active': 'active'
 }
+
+# Padrões de modelos de notebooks para filtro automático
+# Usado para filtrar apenas notebooks da base Lansweeper completa
+NOTEBOOK_MODEL_PATTERNS = [
+    'latitude',      # Dell Latitude (5400, 5410, 5420, 5440, 5480, 5490, 7300)
+    'macbook',       # Apple MacBook
+    'mac',           # Apple Mac (M1, M2)
+    'precision',     # Dell Precision (workstation notebooks)
+    'xps',           # Dell XPS
+    'pro ultra',     # Dell Pro Ultra
+    'inspiron',      # Dell Inspiron (se houver)
+    'vostro'         # Dell Vostro (se houver)
+]

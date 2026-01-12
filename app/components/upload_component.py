@@ -142,8 +142,16 @@ def _render_data_preview(df: pd.DataFrame) -> None:
     
     # Data table preview
     st.markdown("#### Primeiros Registros")
+    
+    # Format Ativo column as integer if present
+    preview_df = df.head(10).copy()
+    if 'Ativo' in preview_df.columns:
+        preview_df['Ativo'] = preview_df['Ativo'].apply(
+            lambda x: int(float(x)) if pd.notna(x) and str(x) != '' else x
+        )
+    
     st.dataframe(
-        df.head(10),
+        preview_df,
         use_container_width=True,
         hide_index=True
     )

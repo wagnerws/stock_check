@@ -164,26 +164,41 @@ def validate_serial_number(serial: str) -> bool:
 
 ## 🔄 Resume Point
 
-**Status Atual:** 🎉 Versão 0.3.0 - 5 Melhorias Implementadas
+**Status Atual:** 🎉 Versão 0.3.1 - Pronto para Uso em Produção
 
-**Última Sessão (10/01/2026):**
-Implementadas 5 melhorias críticas de tratamento de erros:
-1. ✅ Estado "Reservado" adicionado
-2. ✅ Prevenção de leituras duplicadas
-3. ✅ Timezone de Brasília configurado
-4. ✅ Suporte para busca por patrimônio (coluna Ativo)
-5. ✅ Modal de bloqueio para serials não encontrados
+**Última Sessão (10/01/2026 12:23):**
+Sessão de manutenção com execução do comando "save" para fechamento de sessão.
+
+**Estado da Aplicação:**
+- ✅ Aplicação Streamlit rodando localmente na porta 8501
+- ✅ Versão 0.3.1 estável e funcional
+- ✅ Todas as funcionalidades core implementadas e testadas
+- ✅ Deploy sincronizado (branches dev e main atualizadas)
+
+**Últimas Implementações (Sessão Anterior - 10/01/2026 12:07):**
+
+**1. Normalização de Estados PT-BR → EN:**
+- ✅ Mapeamento `STATE_NORMALIZATION` criado
+- ✅ Função `normalize_state()` implementada
+- ✅ Suporte completo para Excel em português e inglês
+- ✅ 6 testes passando
+
+**2. Registro por Patrimônio:**
+- ✅ Busca numérica corrigida (int comparison)
+- ✅ Formatação sem casas decimais (9856, não 9856.0)
+- ✅ Verificação de duplicidade usando serialnumber correto
+- ✅ 5 testes novos, 12 testes total passando
 
 **Próximos Passos Recomendados:**
-1. **Testes em Ambiente Real** - Validar com leitor Zebra DS22
-2. **P3-002: Histórico de Verificações** - Persistência de dados entre sessões
-3. **P3-003: Modo Batch** - Upload de lista de serials para verificação automática
+1. **Validação em Produção** - Testar com leitor Zebra DS22 e Excel real do Lansweeper
+2. **P3-002: Histórico de Verificações** - Implementar persistência de dados entre sessões
+3. **P3-003: Modo Batch** - Implementar upload de lista de serials para verificação automática
 
-**Tarefas do Backlog em Foco:**
-- ✅ **P1-001 a P1-005:** Todas concluídas
-- ✅ **P2-001 a P2-004:** Todas concluídas
-- ✅ **P3-001:** Relatórios e Estatísticas - **CONCLUÍDA**
-- 🟡 **P3-002:** Histórico de Verificações - **PRÓXIMA**
+**Tarefas do Backlog:**
+- ✅ **P1 (Crítico):** 5/5 tarefas concluídas (100%)
+- ✅ **P2 (Importante):** 4/4 tarefas concluídas (100%)
+- ✅ **P3 (Desejável):** 1/5 tarefas concluídas (20%)
+- 🟡 **Próxima Tarefa Sugerida:** P3-002 (Histórico de Verificações)
 
 
 ---
@@ -205,4 +220,98 @@ Implementadas 5 melhorias críticas de tratamento de erros:
 
 ---
 
-**Última Atualização:** 2026-01-10 10:11 BRT
+## 🔄 Resume Point
+
+**Última Sessão:** 12/01/2026 16:37 BRT  
+**Versão Atual:** v0.6.3  
+**Status:** ✅ Deploy em produção concluído
+
+### O Que Foi Feito Hoje
+
+**Implementações:**
+1. ✅ **P3-008: Relatórios em PDF**
+   - Serviço `pdf_generator.py` com reportlab
+   - Três tipos de relatórios (completo, ajustes, histórico)
+   - Compliance: SHA256, timestamp, session ID
+   - Botões de export na interface
+
+2. ✅ **Correção Patrimônio (v0.6.1 → v0.6.3)**
+   - Coluna "Ativo" formatada como inteiro
+   - Aplicado em: Interface, Histórico, Excel, PDF
+   - Solução: openpyxl number_format + conversão na importação
+
+3. ✅ **Deploy para Produção**
+   - Commit `9ee0986` enviado para GitHub (dev)
+   - 25 objetos (19.18 KiB)
+   - Streamlit Cloud auto-deploy iniciado
+   - URL: https://check-stock.streamlit.app/
+
+### Status Atual do Projeto
+
+**Progresso:** 12/16 tarefas (75%)
+
+**✅ Completas:**
+- P1: 5/5 (Funcionalidades críticas)
+- P2: 4/4 (Funcionalidades importantes)
+- P3-001: Relatórios e Estatísticas
+- P3-002: Histórico de Verificações
+- P3-008: Relatórios em PDF
+
+**⏸️ Em Standby:**
+- P3-007: SharePoint Integration
+  - Aguardando: App Registration Azure AD (TI)
+  - Biblioteca destino: Infraestrutura e Ciber > Field > Suporte > Instruções de Trabalho > Estoque Periféricos e Ativos > Controle de estoque - 2026
+
+**❌ Não Aplicável:**
+- P3-003: Modo Batch (incompatível com verificação física)
+- P3-005: Dockerização (já em Streamlit Cloud)
+
+**📋 Opcional Restante:**
+- P3-004: Testes Automatizados Expandidos
+
+### Próximos Passos
+
+**Imediato:**
+1. Aguardar conclusão do deploy no Streamlit Cloud (~2-3 min)
+2. Validar v0.6.3 em produção
+3. Testar geração de PDFs com dados reais
+
+**Curto Prazo:**
+- Aguardar TI liberar Azure AD App Registration para SharePoint
+- Quando disponível: implementar P3-007
+
+**Opcional:**
+- Implementar melhorias UX (atalhos, sons, estatísticas)
+- Expandir testes automatizados
+
+### Informações Importantes
+
+**Logo Anbima:** ✅ Disponível (assets)  
+**URL Produção:** https://check-stock.streamlit.app/  
+**SharePoint Anbima:** https://anbima.sharepoint.com (Site: Tecnologia)  
+**Repositório:** github.com:wagnerws/stock_check.git (branch: dev)
+
+---
+
+## 📚 Lessons Learned
+
+### Boas Práticas
+- Usar `st.session_state` para manter dados entre interações
+- Implementar cache com `@st.cache_data` para operações pesadas
+- Validar arquivos antes de processar
+- Usar `@st.dialog` para modais de confirmação
+- Configurar timezone explícito para timestamps críticos
+- **Formatar células Excel com openpyxl após exportação**
+- **Converter dados numéricos na importação do DataFrame**
+
+### Anti-Padrões a Evitar
+- ❌ Processar arquivos grandes sem progressbar
+- ❌ Não validar colunas do Excel antes de uso
+- ❌ Usar `st.write()` excessivamente (preferir componentes específicos)
+- ❌ Confiar no timezone do servidor (sempre usar timezone explícito)
+- ❌ **Confiar apenas em conversão Python para formatar Excel**
+- ❌ **Esquecer que Excel tem formatação própria de células**
+
+---
+
+**Última Atualização:** 2026-01-12 16:37 BRT

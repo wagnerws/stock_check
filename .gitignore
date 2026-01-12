@@ -12,7 +12,7 @@ build/
 
 # Streamlit
 .streamlit/secrets.toml
-.streamlit/
+!.streamlit/secrets.toml.example
 
 # Environment
 .env
@@ -39,6 +39,10 @@ Thumbs.db
 *.xls
 !tests/fixtures/*.xlsx
 !tests/fixtures/*.xls
+
+# Data files locais (cache temporário se houver)
+data/
+*.json
 
 # SSH Keys
 *.ppk

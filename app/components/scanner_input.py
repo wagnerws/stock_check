@@ -7,6 +7,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from app.services.barcode_handler import process_serial
 from app.services.comparator import compare_and_flag
+from app.services.history_manager import save_session_to_sharepoint
 
 
 @st.dialog("⚠️ Serial Não Encontrado")
@@ -118,6 +119,7 @@ def render_scanner_input():
                     # Adiciona ao histórico (topo)
                     st.session_state.scanned_items.insert(0, result)
                     st.session_state.last_scan_result = result
+                    _auto_save_session()  # AUTO-SAVE
                     
                 else:
                     # Serial não encontrado - BLOQUEAR próximo scan
@@ -126,6 +128,7 @@ def render_scanner_input():
                     # Adiciona ao histórico mesmo não encontrado
                     st.session_state.scanned_items.insert(0, result)
                     st.session_state.last_scan_result = result
+                    _auto_save_session()  # AUTO-SAVE
                     
                     # BLOQUEAR scan até decisão do usuário
                     st.session_state.blocked_scan = True
@@ -150,4 +153,38 @@ def render_scanner_input():
         on_change=on_scan,
         help="Certifique-se que o leitor USB está conectado."
     )
+
+
+def _auto_save_session():
+    """Salva automaticamente a sessão atual em storage local."""
+    try:
+        # Inicializa session_id se não existir (APENAS UMA VEZ)
+        if 'current_session_id' not in st.session_state:
+            st.session_state.current_session_id = datetime.now(ZoneInfo("America/Sao_Paulo")).strftime("%Y%m%d_%H%M%S")
+            st.session_state.session_started_at = datetime.now(ZoneInfo("America/Sao_Paulo")).isoformat()
+        
+        # Preparar items convertendo datetime para string
+        items_serializable = []
+        for item in st.session_state.scanned_items:
+            item_copy = item.copy()
+            # Converter timestamp datetime para string ISO
+            if 'timestamp' in item_copy and isinstance(item_copy['timestamp'], datetime):
+                item_copy['timestamp'] = item_copy['timestamp'].isoformat()
+            items_serializable.append(item_copy)
+        
+        # Preparar dados da sessão (INCLUINDO session_id fixo)
+        session_data = {
+            'session_id': st.session_state.current_session_id,  # MESMO ID sempre
+            'started_at': st.session_state.get('session_started_at'),
+            'lansweeper_file': st.session_state.get('filename', 'N/A'),
+            'items': items_serializable
+        }
+        
+        # Salvar (silenciosamente, sem mensagens)
+        # Isso SOBRESCREVE o arquivo existente
+        save_session_to_sharepoint(session_data)
+        
+    except Exception as e:
+        # Mostrar erro apenas em desenvolvimento
+        st.error(f"Erro ao salvar sessão: {str(e)}")
 

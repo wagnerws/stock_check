@@ -13,6 +13,7 @@ from app.components.upload_component import render_upload_component
 from app.components.scanner_input import render_scanner_input
 from app.components.comparison_component import render_comparison_component, render_session_metrics
 from app.components.report_component import render_report_component
+from app.components.history_component import render_history_component
 
 def main():
     st.set_page_config(
@@ -30,7 +31,7 @@ def main():
 
     # Sidebar
     st.sidebar.title("📦 Stock Check")
-    st.sidebar.caption("v0.3.0")
+    st.sidebar.caption("v0.6.3 - PDF Reports")
     
     st.sidebar.divider()
     
@@ -60,7 +61,7 @@ def main():
     # Main Content
     st.title("Controle de Estoque Físico")
     
-    tab1, tab2, tab3 = st.tabs(["📤 Upload", "🔍 Verificação", "📊 Relatórios"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📤 Upload", "🔍 Verificação", "📊 Relatórios", "📜 Histórico"])
     
     with tab1:
         # Upload component
@@ -79,6 +80,9 @@ def main():
         
     with tab3:
         render_report_component()
+        
+    with tab4:
+        render_history_component()
 
 if __name__ == "__main__":
     main()
