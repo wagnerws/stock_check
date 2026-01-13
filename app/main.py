@@ -31,7 +31,7 @@ def main():
 
     # Sidebar
     st.sidebar.title("📦 Stock Check")
-    st.sidebar.caption("v0.6.3 - PDF Reports")
+    st.sidebar.caption("v0.8.0 - Inventory by Model")
     
     st.sidebar.divider()
     
@@ -55,6 +55,7 @@ def main():
         - ⚙️ In Repair
         - 📦 Old
         - 🔖 Reserved
+        - 💰 Sold
         """
     )
     

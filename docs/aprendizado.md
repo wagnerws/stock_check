@@ -1,3 +1,90 @@
+# Aprendizados do Projeto - Stock Check
+
+## Data: 12/01/2026
+
+### Filtros de Dados com Pandas
+
+**Lição:** Filtros restritivos demais podem eliminar dados válidos inesperadamente.
+
+**Contexto:**
+- Filtro de notebooks estava eliminando 93% dos registros (932 → 62)
+- Problema: campos vazios/null eram tratados como inválidos
+
+**Solução:**
+```python
+# RUIM: Exclui registros com campo vazio
+filter = df['Model'].str.contains('pattern')
+
+# BOM: Inclui registros com padrão OU campo vazio
+has_value = df['Model'].notna() & (df['Model'] != '')
+has_pattern = df['Model'].str.contains('pattern')
+filter_inclusive = has_pattern | ~has_value  # OR logic
+```
+
+**Aprendizado:**
+- Sempre considerar valores NULL/vazios em filtros
+- Usar lógica OR quando apropriado (inclusão ao invés de exclusão)
+- Adicionar logging detalhado em cada etapa do filtro
+- Testar com dados reais o mais cedo possível
+
+---
+
+### Debug de Filtros Multicritério
+
+**Técnica Eficaz:** Logging progressivo mostrando quantos registros passam em cada etapa.
+
+**Implementação:**
+```python
+total = len(df)
+print(f"📊 Total original: {total}")
+
+# Filtro 1
+after_filter1 = filter1.sum()
+print(f"📊 Após filtro 1: {total} → {after_filter1}")
+
+# Filtro 2
+after_filter2 = (filter1 & filter2).sum()
+print(f"📊 Após filtro 2: {after_filter1} → {after_filter2}")
+
+# Final
+final = df[filter1 & filter2 & filter3]
+print(f"✅ Resultado final: {len(final)} registros")
+```
+
+**Benefícios:**
+- Identifica rapidamente qual filtro está causando problema
+- Visível no terminal durante execução
+- Ajuda usuário a entender o que está acontecendo
+
+---
+
+### Tabelas Pivotadas com Pandas
+
+**Uso:** `pd.crosstab()` é perfeito para análises de inventário.
+
+**Exemplo:**
+```python
+# Criar tabela Model x State
+pivot = pd.crosstab(
+    df['Model'],      # Linhas
+    df['State'],      # Colunas
+    margins=True,     # Adiciona linha/coluna TOTAL
+    margins_name='TOTAL'
+)
+
+# Reordenar colunas em ordem lógica
+desired_order = ['stock', 'active', 'broken', ...]
+pivot = pivot[desired_order]
+```
+
+**Vantagens:**
+- Visualização clara de distribuição
+- Fácil de exportar para Excel/PDF
+- Linha TOTAL automática
+- Integrável com gráficos Streamlit
+
+---
+
 # Aprendizados do Projeto Stock Check
 
 ## Formatação de Números no Excel com openpyxl (12/01/2026)

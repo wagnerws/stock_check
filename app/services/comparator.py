@@ -114,7 +114,7 @@ def compare_and_flag(serial: str, database: pd.DataFrame) -> Dict[str, Any]:
     # Determine emoji based on state
     if requires_adjustment:
         status_emoji = '⚠️'
-    elif state in ['stock', 'broken', 'stolen', 'in repair', 'old', 'reserved']:
+    elif state in ['stock', 'broken', 'stolen', 'in repair', 'old', 'reserved', 'sold']:
         status_emoji = '✅'
     else:
         status_emoji = '❓'

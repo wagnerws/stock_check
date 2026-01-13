@@ -10,6 +10,7 @@ VALID_STATES = {
     'in repair': '⚙️ Em reparo - OK',
     'old': '📦 Equipamento antigo - OK',
     'reserved': '🔖 Reservado - OK',
+    'sold': '💰 Vendido - OK',
     'active': '⚠️ ATIVO - Requer ajuste no Lansweeper'
 }
 
@@ -21,11 +22,12 @@ STATE_EMOJI = {
     'in repair': '⚙️',
     'old': '📦',
     'reserved': '🔖',
+    'sold': '💰',
     'active': '⚠️'
 }
 
 # Lista de estados que NÃO requerem ajuste manual
-OK_STATES = ['stock', 'broken', 'stolen', 'in repair', 'old', 'reserved']
+OK_STATES = ['stock', 'broken', 'stolen', 'in repair', 'old', 'reserved', 'sold']
 
 # Estado que requer ajuste no Lansweeper
 REQUIRES_ADJUSTMENT_STATE = 'active'
@@ -52,6 +54,7 @@ STATE_NORMALIZATION = {
     'em reparo': 'in repair',
     'antigo': 'old',
     'reservado': 'reserved',
+    'vendido': 'sold',
     'ativo': 'active',
     # Inglês → Inglês (idempotência)
     'stock': 'stock',
@@ -60,18 +63,39 @@ STATE_NORMALIZATION = {
     'in repair': 'in repair',
     'old': 'old',
     'reserved': 'reserved',
+    'sold': 'sold',
     'active': 'active'
 }
 
 # Padrões de modelos de notebooks para filtro automático
 # Usado para filtrar apenas notebooks da base Lansweeper completa
 NOTEBOOK_MODEL_PATTERNS = [
-    'latitude',      # Dell Latitude (5400, 5410, 5420, 5440, 5480, 5490, 7300)
-    'macbook',       # Apple MacBook
-    'mac',           # Apple Mac (M1, M2)
-    'precision',     # Dell Precision (workstation notebooks)
-    'xps',           # Dell XPS
-    'pro ultra',     # Dell Pro Ultra
-    'inspiron',      # Dell Inspiron (se houver)
-    'vostro'         # Dell Vostro (se houver)
+    'latitude',      # Dell Latitude (5400, 5410, 5420, 5440, 5480, 5490, 7300, 7350)
+    'dell pro',      # Dell Pro 14 (pc14250)
+    'macbook',       # Apple MacBook (Air, Pro)
+    'mac14',         # Apple Mac14,2
+    'macbookair',    # MacBookAir10,1
+    'macbookpro'     # MacBook Pro
 ]
+
+# Padrões de modelos a EXCLUIR (desktops, VMs, etc)
+EXCLUDE_MODEL_PATTERNS = [
+    'optiplex',      # Dell Optiplex (desktop)
+    'virtual',       # Máquinas virtuais
+    'fortinet'       # Fortinet
+]
+
+# Sistemas operacionais válidos para notebooks
+# Padrões flexíveis para aceitar diferentes formatos no Lansweeper
+VALID_OS_PATTERNS = [
+    'windows',          # Windows (genérico)
+    'microsoft',        # Microsoft Windows
+    'win 10',           # Windows 10
+    'win 11',           # Windows 11
+    'win10',            # Windows10
+    'win11',            # Windows11
+    'macos',            # macOS
+    'mac os',           # Mac OS
+    'os x',             # OS X
+]
+

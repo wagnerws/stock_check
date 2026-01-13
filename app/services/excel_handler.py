@@ -43,12 +43,15 @@ def import_excel(file_path: str) -> Optional[pd.DataFrame]:
                 lambda x: int(float(x)) if pd.notna(x) and x != '' else None
             )
         
-        # TODO: FILTRO AUTOMÁTICO DE NOTEBOOKS (P3-008)
-        # Filtro comentado temporariamente - causando erro no upload
-        # df_notebooks = filter_notebooks_only(df)
-        # return df_notebooks
+        # Filtro automático de notebooks
+        # Filtra apenas Dell Latitude, Dell Pro, MacBook
+        # Exclui Optiplex, VMs, Fortinet
+        df_notebooks = filter_notebooks_only(df)
         
-        return df
+        if df_notebooks.empty:
+            raise ValueError("Nenhum notebook encontrado após aplicar filtro. Verifique se a base contém Dell Latitude, Dell Pro ou MacBook.")
+        
+        return df_notebooks
     
     except Exception as e:
         print(f"Erro ao importar Excel: {str(e)}")
@@ -57,7 +60,17 @@ def import_excel(file_path: str) -> Optional[pd.DataFrame]:
 
 def filter_notebooks_only(df: pd.DataFrame) -> pd.DataFrame:
     """
-    Filtra apenas notebooks da base completa usando padrões de modelo.
+    Filtra apenas notebooks da base completa.
+    
+    Inclui:
+    - Dell Latitude, Dell Pro
+    - MacBook (todos os modelos)
+    
+    Exclui:
+    - Optiplex (desktops)
+    - Máquinas virtuais
+    - Fortinet
+    - Sistemas operacionais não-notebook
     
     Args:
         df: DataFrame completo do Lansweeper
@@ -65,35 +78,101 @@ def filter_notebooks_only(df: pd.DataFrame) -> pd.DataFrame:
     Returns:
         DataFrame filtrado apenas com notebooks
     """
-    from app.utils.constants import NOTEBOOK_MODEL_PATTERNS
+    from app.utils.constants import NOTEBOOK_MODEL_PATTERNS, EXCLUDE_MODEL_PATTERNS, VALID_OS_PATTERNS
     
-    # Verificar se coluna Model existe
+    # Se não tem coluna Model, retornar tudo sem filtrar
     if 'Model' not in df.columns:
         print("⚠️ Coluna 'Model' não encontrada. Retornando todos os registros.")
         return df
     
     try:
-        # Filtrar linhas onde Model contém qualquer padrão de notebook (case-insensitive)
-        # Garantir que valores None/NaN sejam tratados
-        mask = df['Model'].fillna('').str.lower().str.contains(
+        total_original = len(df)
+        
+        # Filtro 1: Model contém padrão de notebook OU é vazio/null
+        # Mudança: Se Model estiver vazio, INCLUIR no resultado
+        model_has_value = df['Model'].notna() & (df['Model'] != '')
+        model_include = df['Model'].fillna('').str.lower().str.contains(
             '|'.join(NOTEBOOK_MODEL_PATTERNS),
             case=False,
             na=False,
             regex=True
         )
+        # Incluir se: tem padrão de notebook OU Model está vazio
+        filter_include = model_include | ~model_has_value
         
-        df_filtered = df[mask].copy()
+        after_include = filter_include.sum()
+        print(f"📊 Filtro INCLUDE: {total_original} → {after_include} registros (incluiu modelos de notebook ou vazios)")
         
-        total_original = len(df)
-        total_notebooks = len(df_filtered)
+        # Filtro 2: Model NÃO contém padrão de exclusão (Optiplex, VMs, etc)
+        # Apenas aplicar se Model tem valor
+        model_exclude = ~df['Model'].fillna('').str.lower().str.contains(
+            '|'.join(EXCLUDE_MODEL_PATTERNS),
+            case=False,
+            na=False,
+            regex=True
+        )
         
-        print(f"📊 Filtro aplicado: {total_notebooks} notebooks de {total_original} dispositivos totais")
+        after_exclude = (filter_include & model_exclude).sum()
+        print(f"📊 Filtro EXCLUDE: {after_include} → {after_exclude} registros (excluiu Optiplex, VMs, Fortinet)")
+        
+        
+        # Filtro 3: OS é Windows ou macOS (se coluna existe)
+        # OU Type é Notebook/Laptop (filtro alternativo)
+        has_valid_os = True  # Default: passar se não tiver coluna OS
+        
+        if 'OS' in df.columns:
+            os_valid = df['OS'].fillna('').str.lower().str.contains(
+                '|'.join(VALID_OS_PATTERNS),
+                case=False,
+                na=False,
+                regex=True
+            )
+            has_valid_os = os_valid
+            after_os = (filter_include & model_exclude & os_valid).sum()
+            print(f"📊 Filtro OS: {after_exclude} → {after_os} registros (apenas Windows/macOS)")
+        else:
+            print(f"⚠️ Coluna 'OS' não encontrada. Pulando filtro de OS.")
+        
+        # Filtro 4: Type é Notebook/Laptop (filtro adicional/alternativo)
+        has_valid_type = True  # Default: passar se não tiver coluna Type
+        
+        if 'Type' in df.columns:
+            type_valid = df['Type'].fillna('').str.lower().str.contains(
+                'notebook|laptop|portable',
+                case=False,
+                na=False,
+                regex=True
+            )
+            has_valid_type = type_valid
+            after_type = (filter_include & model_exclude & type_valid).sum()
+            print(f"📊 Filtro TYPE: {after_exclude} → {after_type} registros (apenas Notebook/Laptop)")
+        else:
+            print(f"⚠️ Coluna 'Type' não encontrada. Pulando filtro de Type.")
+        
+        # Combinar filtros: (Model correto) E (OS válido OU Type válido)
+        # Isso significa: se tiver OS válido OU Type válido, passa
+        if 'OS' in df.columns or 'Type' in df.columns:
+            os_or_type = has_valid_os | has_valid_type
+            final_filter = filter_include & model_exclude & os_or_type
+        else:
+            # Se não tem nem OS nem Type, usar apenas filtros de modelo
+            final_filter = filter_include & model_exclude
+
+        
+        df_filtered = df[final_filter].copy()
+        
+        print(f"✅ Resultado final: {len(df_filtered)} notebooks de {total_original} registros totais")
+        
+        # Debug: Mostrar alguns exemplos de modelos que PASSARAM no filtro
+        if len(df_filtered) > 0 and 'Model' in df_filtered.columns:
+            unique_models = df_filtered['Model'].dropna().unique()[:10]
+            print(f"📝 Exemplos de modelos incluídos: {', '.join(str(m) for m in unique_models)}")
         
         return df_filtered
         
     except Exception as e:
         print(f"⚠️ Erro ao filtrar notebooks: {str(e)}")
-        print("⚠️ Retornando todos os registros.")
+        print(f"⚠️ Retornando todos os registros sem filtro.")
         return df
 
 
