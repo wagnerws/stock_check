@@ -1,5 +1,141 @@
 # Histórico de Configuração do Projeto
 
+## Data: 12/01/2026 - 19:20 BRT
+
+### 25. Correção do Filtro de OS e Adição de Filtro Type (v0.7.1)
+
+#### Contexto
+Após implementar v0.7.0, os logs mostraram que o filtro de OS estava eliminando Dell Latitude (de 932 caiu para 62 notebooks). Apenas MacBooks passavam porque tinham "macOS" no campo OS.
+
+#### Problema Identificado (via Logs)
+```
+📊 Filtro INCLUDE: 2069 → 932 registros ✓
+📊 Filtro EXCLUDE: 932 → 932 registros ✓  
+📊 Filtro OS: 932 → 62 registros ✗ PROBLEMA AQUI!
+✅ Resultado final: 62 notebooks (só MacBooks)
+```
+
+**Causa raiz:** 
+- O campo OS nos Dell Latitude tinha formato como "Microsoft Windows 10" ou "Windows 11"
+- Padrões antigos (`VALID_OS_PATTERNS = ['windows', 'macos', 'mac os']`) não capturavam essas variações
+
+#### Soluções Implementadas
+
+**1. Padrões de OS Expandidos (`app/utils/constants.py`):**
+```python
+# ANTES:
+VALID_OS_PATTERNS = ['windows', 'macos', 'mac os']
+
+# DEPOIS:
+VALID_OS_PATTERNS = [
+    'windows',          # Windows (genérico)
+    'microsoft',        # Microsoft Windows
+    'win 10',           # Windows 10
+    'win 11',           # Windows 11
+    'win10', 'win11',   # Variações
+    'macos', 'mac os', 'os x'  # macOS
+]
+```
+
+**2. Filtro Adicional por Type (`app/services/excel_handler.py`):**
+- Adicionado verificação da coluna `Type`
+- Se Type contém "notebook", "laptop" ou "portable" → Incluir
+- Lógica: **(Model correto) E (OS válido OU Type válido)**
+
+```python
+# Filtro alternativo por Type
+if 'Type' in df.columns:
+    type_valid = df['Type'].str.contains('notebook|laptop|portable')
+    
+# Combinar: OS válido OU Type válido
+os_or_type = has_valid_os | has_valid_type
+final_filter = filter_include & model_exclude & os_or_type
+```
+
+**3. Logs Aprimorados:**
+```
+📊 Filtro OS: 932 → XXX registros (apenas Windows/macOS)
+📊 Filtro TYPE: 932 → XXX registros (apenas Notebook/Laptop)
+```
+
+#### Arquivos Modificados
+- `app/utils/constants.py` - Padrões de OS expandidos
+- `app/services/excel_handler.py` - Filtro por Type adicionado
+- `app/main.py` - Versão → 0.7.1
+
+#### Resultado Esperado
+
+**Agora devem passar:**
+- ✅ Dell Latitude (OS: "Microsoft Windows 10" OU Type: "Notebook")
+- ✅ Dell Pro (OS: "Windows 11" OU Type: "Laptop")  
+- ✅ MacBook (OS: "macOS" OU Type: "Portable")
+
+**Logs esperados:**
+```
+📊 Filtro INCLUDE: 2069 → ~900 registros
+📊 Filtro EXCLUDE: ~900 → ~900 registros
+📊 Filtro OS: ~900 → ~500 registros (Windows/macOS)
+📊 Filtro TYPE: ~900 → ~800 registros (Notebook/Laptop)
+✅ Resultado final: ~800-900 notebooks (inclui Dells + Macs)
+```
+
+#### Próximos Passos
+1. Reiniciar Streamlit (Ctrl+C e rodar novamente)
+2. Fazer upload da base novamente
+3. Conferir logs - deve mostrar muito mais notebooks agora!
+
+---
+
+## Data: 12/01/2026 - 19:15 BRT
+
+### 24. Correção do Filtro de Notebooks (v0.7.0)
+
+#### Contexto
+Usuário reportou que após fazer upload da base Lansweeper, apenas MacBooks estavam aparecendo, quando deveria incluir todos os notebooks (Dell Latitude, Dell Pro, etc).
+
+#### Problema Identificado
+O filtro automático de notebooks em `excel_handler.py` estava muito restritivo. A lógica original excluía registros onde o campo `Model` estava vazio ou null, o que podia eliminar notebooks válidos da base.
+
+#### Solução Implementada
+
+**1. Lógica de Filtro Modificada (`app/services/excel_handler.py`):**
+- **Antes:** Incluía APENAS registros com Model contendo "latitude", "macbook", etc
+- **Depois:** Inclui registros com padrões de notebook OU Model vazio/null
+- **Justificativa:** Alguns notebooks podem ter campo Model vazio na base Lansweeper
+
+**2. Debug Logging Adicionado:**
+```python
+# Logs em cada etapa do filtro:
+- Total de registros original
+- Após filtro de inclusão (notebooks)
+- Após filtro de exclusão (Optiplex, VMs)
+- Após filtro de OS (Windows/macOS)
+- Exemplos de modelos incluídos
+```
+
+**3. Interface Atualizada (`app/components/upload_component.py`):**
+- Mensagem informativa sobre filtro automático aplicado
+- Feedback claro sobre quantos notebooks foram encontrados
+- Info box explicando que desktops e VMs são excluídos
+
+#### Arquivos Modificados
+- `app/services/excel_handler.py` - Função `filter_notebooks_only()` com lógica mais inclusiva
+- `app/components/upload_component.py` - Mensagens informativas sobre filtragem
+- `app/main.py` - Versão atualizada para 0.7.0
+
+#### Resultado Esperado
+- ✅ Todos os notebooks (Dell Latitude, Dell Pro, MacBook) agora aparecem
+- ✅ Registros com Model vazio não são mais excluídos automaticamente
+- ✅ Logs de debug ajudam a identificar problemas de filtragem
+- ✅ Usuário tem visibilidade do que está sendo filtrado
+
+#### Próximos Passos
+1. Usuário fazer upload da base novamente
+2. Verificar logs no terminal Streamlit para conferir estatísticas de filtragem
+3. Validar que todos os notebooks esperados aparecem na preview
+
+---
+
 ## Data: 12/01/2026 - 16:25 BRT
 
 ### 23. Deploy v0.6.3 para Produção 🚀

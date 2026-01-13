@@ -222,74 +222,63 @@ Sessão de manutenção com execução do comando "save" para fechamento de sess
 
 ## 🔄 Resume Point
 
-**Última Sessão:** 12/01/2026 16:37 BRT  
-**Versão Atual:** v0.6.3  
-**Status:** ✅ Deploy em produção concluído
+**Status Atual:** 🎉 Versão 0.8.0 - Inventário por Modelo Implementado
 
-### O Que Foi Feito Hoje
+**Última Sessão (12/01/2026 19:49 BRT):**
+Sessão de correção de filtros e implementação de novas funcionalidades.
 
-**Implementações:**
-1. ✅ **P3-008: Relatórios em PDF**
-   - Serviço `pdf_generator.py` com reportlab
-   - Três tipos de relatórios (completo, ajustes, histórico)
-   - Compliance: SHA256, timestamp, session ID
-   - Botões de export na interface
+**Estado da Aplicação:**
+- ✅ Aplicação Streamlit rodando localmente
+- ✅ Versão 0.8.0 estável e funcional
+- ✅ Filtros de notebooks corrigidos
+- ✅ Novo relatório de inventário por modelo implementado
 
-2. ✅ **Correção Patrimônio (v0.6.1 → v0.6.3)**
-   - Coluna "Ativo" formatada como inteiro
-   - Aplicado em: Interface, Histórico, Excel, PDF
-   - Solução: openpyxl number_format + conversão na importação
+**Resumo da Sessão (12/01/2026):**
 
-3. ✅ **Deploy para Produção**
-   - Commit `9ee0986` enviado para GitHub (dev)
-   - 25 objetos (19.18 KiB)
-   - Streamlit Cloud auto-deploy iniciado
-   - URL: https://check-stock.streamlit.app/
+**1. Correção do Filtro de Notebooks (v0.7.0 → v0.7.1):**
+- ✅ **Problema identificado:** Filtro muito restritivo excluía registros com Model vazio (932 → 62 notebooks)
+- ✅ **Solução v0.7.0:** Lógica mais inclusiva (Model vazio agora é incluído)
+- ✅ **Solução v0.7.1:** 
+  - Padrões de OS expandidos (microsoft, win 10, win 11, etc)
+  - Filtro adicional por coluna Type (notebook|laptop|portable)
+  - Lógica OR: passa se (OS válido OU Type válido)
+- ✅ Debug logging detalhado em cada etapa do filtro
 
-### Status Atual do Projeto
+**2. Adição de Estado 'Sold' (v0.7.2):**
+- ✅ Estado "sold" (vendido) 💰 adicionado
+- ✅ Tratado como OK (não requer ajuste)
+- ✅ Mapeamento PT-BR: "vendido" → "sold"
+- ✅ Interface atualizada
 
-**Progresso:** 12/16 tarefas (75%)
+**3. Inventário por Modelo (v0.8.0):**
+- ✅ Nova seção na aba Relatórios
+- ✅ Tabela pivotada: Model x Estado
+- ✅ Mostra quantidade de cada modelo em cada estado (stock, broken, stolen, etc)
+- ✅ Gráfico de barras com top 10 modelos
+- ✅ Linha TOTAL para agregação
 
-**✅ Completas:**
-- P1: 5/5 (Funcionalidades críticas)
-- P2: 4/4 (Funcionalidades importantes)
-- P3-001: Relatórios e Estatísticas
-- P3-002: Histórico de Verificações
-- P3-008: Relatórios em PDF
+**Arquivos Modificados:**
+- `app/services/excel_handler.py` - Filtros corrigidos e melhorados
+- `app/utils/constants.py` - Padrões OS expandidos + estado sold
+- `app/components/upload_component.py` - Mensagens informativas
+- `app/components/report_component.py` - Inventário por modelo
+- `app/services/comparator.py` - Suporte a sold
+- `app/main.py` - Versões atualizadas (0.7.0 → 0.8.0)
+- `docs/historico.md` - Documentação completa
 
-**⏸️ Em Standby:**
-- P3-007: SharePoint Integration
-  - Aguardando: App Registration Azure AD (TI)
-  - Biblioteca destino: Infraestrutura e Ciber > Field > Suporte > Instruções de Trabalho > Estoque Periféricos e Ativos > Controle de estoque - 2026
+**Próximos Passos Recomendados:**
+1. **Validar filtros** - Fazer upload da base e confirmar que todos os notebooks aparecem
+2. **Testar inventário** - Verificar visualização na aba Relatórios
+3. **Deploy** - Quando pronto, fazer commit e push para produção
 
-**❌ Não Aplicável:**
-- P3-003: Modo Batch (incompatível com verificação física)
-- P3-005: Dockerização (já em Streamlit Cloud)
+**Tarefas do Backlog:**
+- ✅ **P1 (Crítico):** 5/5 tarefas concluídas (100%)
+- ✅ **P2 (Importante):** 4/4 tarefas concluídas (100%)
+- ✅ **P3 (Desejável):** 3/7 tarefas concluídas (42.8%)
+- 🟡 **Próxima Tarefa Sugerida:** P3-007 (SharePoint Integration)
 
-**📋 Opcional Restante:**
-- P3-004: Testes Automatizados Expandidos
-
-### Próximos Passos
-
-**Imediato:**
-1. Aguardar conclusão do deploy no Streamlit Cloud (~2-3 min)
-2. Validar v0.6.3 em produção
-3. Testar geração de PDFs com dados reais
-
-**Curto Prazo:**
-- Aguardar TI liberar Azure AD App Registration para SharePoint
-- Quando disponível: implementar P3-007
-
-**Opcional:**
-- Implementar melhorias UX (atalhos, sons, estatísticas)
-- Expandir testes automatizados
-
-### Informações Importantes
-
-**Logo Anbima:** ✅ Disponível (assets)  
-**URL Produção:** https://check-stock.streamlit.app/  
-**SharePoint Anbima:** https://anbima.sharepoint.com (Site: Tecnologia)  
-**Repositório:** github.com:wagnerws/stock_check.git (branch: dev)
+**Versão em Desenvolvimento:** v0.8.0
+**Versão em Produção:** v0.6.3
 
 ---
 

@@ -91,7 +91,13 @@ def render_upload_component() -> Optional[pd.DataFrame]:
                 return None
             
             # Success - show preview
-            st.success(f"✅ **Arquivo validado com sucesso!** {len(df)} registros encontrados.")
+            st.success(f"✅ **Arquivo validado com sucesso!** {len(df)} registros de notebooks encontrados.")
+            
+            # Info box about filtering
+            st.info(
+                "ℹ️ **Filtro automático aplicado:** Apenas notebooks (Dell Latitude, Dell Pro, MacBook) "
+                "foram importados. Desktops e VMs foram excluídos automaticamente."
+            )
             
             # Display preview
             _render_data_preview(df)

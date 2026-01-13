@@ -7,4 +7,4 @@ ideias que surgem durante o desenvolvimento
   - Metadados de compliance (timestamp, session ID)
 
 
-  mostrar modelos das maquinas e
+
