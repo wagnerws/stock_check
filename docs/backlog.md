@@ -283,8 +283,8 @@
 |------------|---------|--------|
 | P1 (Crítico) | 5 | ✅ 5/5 |
 | P2 (Importante) | 4 | ✅ 4/4 |
-| P3 (Desejável) | 7 | ✅ 3/7 |
-| **TOTAL** | **16** | **12/16 (75%)** |
+| P3 (Desejável) | 8 | ✅ 3/8 |
+| **TOTAL** | **17** | **12/17 (70.6%)** |
 
 ---
 
@@ -298,3 +298,27 @@ Implementar OAuth Device Code Flow e upload automático de PDFs para SharePoint,
 - Tenant ID e Client ID (Azure AD App Registration)
 - Site/Biblioteca de documentos alvo
 - Logo Anbima (PNG/SVG)
+
+---
+
+## ⏸️ Tarefas em Standby
+
+### P3-009: Persistência Automática da Base Lansweeper
+**Status:** ⏸️ Em Standby (por solicitação do usuário - 12/01/2026)
+**Dependências:** P1-004
+**Complexidade:** Baixa
+
+**Descrição:**
+- Salvar automaticamente a última base Lansweeper uploadada
+- Carregar automaticamente ao abrir a aplicação
+- Evita necessidade de upload repetido
+
+**Benefícios:**
+- Melhor UX - não precisa fazer upload toda vez
+- Usa sempre a base mais recente
+- Notificação clara de qual base está sendo usada
+
+**Implementação Sugerida:**
+- Salvar em `data/last_base.xlsx` + metadata JSON
+- Auto-load na inicialização
+- Botão para forçar novo upload se necessário
