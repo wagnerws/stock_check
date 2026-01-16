@@ -72,15 +72,15 @@ STATE_NORMALIZATION = {
 NOTEBOOK_MODEL_PATTERNS = [
     'latitude',      # Dell Latitude (5400, 5410, 5420, 5440, 5480, 5490, 7300, 7350)
     'dell pro',      # Dell Pro 14 (pc14250)
+    'optiplex',      # Dell OptiPlex (7040 e outros modelos)
     'macbook',       # Apple MacBook (Air, Pro)
     'mac14',         # Apple Mac14,2
     'macbookair',    # MacBookAir10,1
     'macbookpro'     # MacBook Pro
 ]
 
-# Padrões de modelos a EXCLUIR (desktops, VMs, etc)
+# Padrões de modelos a EXCLUIR (VMs, equipamentos de rede, etc)
 EXCLUDE_MODEL_PATTERNS = [
-    'optiplex',      # Dell Optiplex (desktop)
     'virtual',       # Máquinas virtuais
     'fortinet'       # Fortinet
 ]
@@ -97,5 +97,6 @@ VALID_OS_PATTERNS = [
     'macos',            # macOS
     'mac os',           # Mac OS
     'os x',             # OS X
+    'not scanned',      # Equipamentos não escaneados pelo Lansweeper
 ]
 

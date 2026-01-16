@@ -43,36 +43,58 @@ def find_equipment(serial: str, database: pd.DataFrame) -> Optional[Dict[str, An
         Dicionário com dados do equipamento ou None se não encontrado
     """
     if database is None or database.empty:
+        print("⚠️ DEBUG: Database is None or empty")
         return None
     
     # Normalize serial for comparison
     normalized_serial = normalize_serial(serial)
+    print(f"\n🔍 DEBUG: Buscando serial/patrimônio: '{serial}' -> Normalizado: '{normalized_serial}'")
+    
+    # Debug: Show sample of database serials
+    if 'Serialnumber' in database.columns:
+        sample_serials = database['Serialnumber'].head(5).tolist()
+        print(f"📊 DEBUG: Amostra de serials na base: {sample_serials}")
     
     # 1. Search by Serialnumber (prioridade 1)
+    print(f"🔎 DEBUG: Procurando em 'Serialnumber'...")
     mask = database['Serialnumber'].str.upper() == normalized_serial.upper()
     result = database[mask]
+    print(f"   Resultados encontrados: {len(result)}")
     
     # 2. If not found and Ativo column exists, search by patrimônio (prioridade 2)
     if result.empty and 'Ativo' in database.columns:
+        print(f"🔎 DEBUG: Não encontrado no Serial. Procurando em 'Ativo' (patrimônio)...")
+        
+        # Debug: Show sample of Ativo values
+        sample_ativos = database['Ativo'].dropna().head(5).tolist()
+        print(f"📊 DEBUG: Amostra de valores em 'Ativo': {sample_ativos}")
+        
         try:
             # Tentar converter input para número (patrimônio pode ser numérico)
             input_as_number = int(float(normalized_serial))
+            print(f"   Input convertido para número: {input_as_number}")
+            
             # Comparar como números (Ativo pode vir como float do Excel)
             mask_ativo = database['Ativo'].apply(
                 lambda x: int(float(x)) == input_as_number if pd.notna(x) else False
             )
             result = database[mask_ativo]
-        except (ValueError, TypeError):
+            print(f"   Resultados encontrados por número: {len(result)}")
+        except (ValueError, TypeError) as e:
+            print(f"   Não é número válido ({e}), tentando como string...")
             # Se não for número, tentar comparação como string (fallback)
             mask_ativo = database['Ativo'].astype(str).str.upper() == normalized_serial.upper()
             result = database[mask_ativo]
+            print(f"   Resultados encontrados por string: {len(result)}")
     
     
     if result.empty:
+        print(f"❌ DEBUG: Nenhum resultado encontrado para '{serial}'")
         return None
     
     # Get first match
     equipment = result.iloc[0]
+    print(f"✅ DEBUG: Equipamento encontrado! Serial: {equipment['Serialnumber']}, State: {equipment.get('State', 'N/A')}")
     
     return {
         'serialnumber': equipment['Serialnumber'],

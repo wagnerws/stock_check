@@ -31,6 +31,8 @@ def import_excel(file_path: str) -> Optional[pd.DataFrame]:
         # Read Excel file
         df = pd.read_excel(file_path, engine='openpyxl')
         
+        print(f"\n📂 Arquivo carregado: {len(df)} registros totais")
+        
         # Validate structure
         is_valid, error_message = validate_excel_structure(df)
         
@@ -44,12 +46,15 @@ def import_excel(file_path: str) -> Optional[pd.DataFrame]:
             )
         
         # Filtro automático de notebooks
-        # Filtra apenas Dell Latitude, Dell Pro, MacBook
-        # Exclui Optiplex, VMs, Fortinet
-        df_notebooks = filter_notebooks_only(df)
+        # Filtra notebooks (Dell Latitude, Dell Pro, OptiPlex, MacBook)
+        # Exclui VMs, Fortinet e outros equipamentos não-notebook
+        df_notebooks, df_removed = filter_notebooks_only(df)
         
         if df_notebooks.empty:
-            raise ValueError("Nenhum notebook encontrado após aplicar filtro. Verifique se a base contém Dell Latitude, Dell Pro ou MacBook.")
+            raise ValueError(
+                "Nenhum notebook encontrado após aplicar filtro. "
+                "Verifique se a base contém Dell Latitude, Dell Pro, OptiPlex ou MacBook."
+            )
         
         return df_notebooks
     
@@ -58,7 +63,7 @@ def import_excel(file_path: str) -> Optional[pd.DataFrame]:
         return None
 
 
-def filter_notebooks_only(df: pd.DataFrame) -> pd.DataFrame:
+def filter_notebooks_only(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Filtra apenas notebooks da base completa.
     
@@ -76,14 +81,14 @@ def filter_notebooks_only(df: pd.DataFrame) -> pd.DataFrame:
         df: DataFrame completo do Lansweeper
         
     Returns:
-        DataFrame filtrado apenas com notebooks
+        Tupla (DataFrame filtrado apenas com notebooks, DataFrame com registros removidos)
     """
     from app.utils.constants import NOTEBOOK_MODEL_PATTERNS, EXCLUDE_MODEL_PATTERNS, VALID_OS_PATTERNS
     
     # Se não tem coluna Model, retornar tudo sem filtrar
     if 'Model' not in df.columns:
         print("⚠️ Coluna 'Model' não encontrada. Retornando todos os registros.")
-        return df
+        return df, pd.DataFrame()
     
     try:
         total_original = len(df)
@@ -160,20 +165,27 @@ def filter_notebooks_only(df: pd.DataFrame) -> pd.DataFrame:
 
         
         df_filtered = df[final_filter].copy()
+        df_removed = df[~final_filter].copy()
         
         print(f"✅ Resultado final: {len(df_filtered)} notebooks de {total_original} registros totais")
+        print(f"❌ Removidos: {len(df_removed)} registros")
         
         # Debug: Mostrar alguns exemplos de modelos que PASSARAM no filtro
         if len(df_filtered) > 0 and 'Model' in df_filtered.columns:
             unique_models = df_filtered['Model'].dropna().unique()[:10]
             print(f"📝 Exemplos de modelos incluídos: {', '.join(str(m) for m in unique_models)}")
         
-        return df_filtered
+        # Debug: Mostrar alguns seriais que foram REMOVIDOS
+        if len(df_removed) > 0 and 'Serialnumber' in df_removed.columns:
+            sample_removed = df_removed['Serialnumber'].head(5).tolist()
+            print(f"🗑️ Exemplos de seriais removidos: {sample_removed}")
+        
+        return df_filtered, df_removed
         
     except Exception as e:
         print(f"⚠️ Erro ao filtrar notebooks: {str(e)}")
         print(f"⚠️ Retornando todos os registros sem filtro.")
-        return df
+        return df, pd.DataFrame()
 
 
 def validate_excel_structure(df: pd.DataFrame) -> Tuple[bool, str]:

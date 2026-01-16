@@ -222,63 +222,64 @@ Sessão de manutenção com execução do comando "save" para fechamento de sess
 
 ## 🔄 Resume Point
 
-**Status Atual:** 🎉 Versão 0.8.0 - Inventário por Modelo Implementado
+**Status Atual:** 🎉 Versão 0.8.0 - Produção Atualizada
 
-**Última Sessão (12/01/2026 19:49 BRT):**
-Sessão de correção de filtros e implementação de novas funcionalidades.
+**Última Sessão (12/01/2026 23:40 BRT):**
+Sessão completa: correção de filtros, novas funcionalidades, limpeza e deploy.
 
 **Estado da Aplicação:**
-- ✅ Aplicação Streamlit rodando localmente
-- ✅ Versão 0.8.0 estável e funcional
-- ✅ Filtros de notebooks corrigidos
-- ✅ Novo relatório de inventário por modelo implementado
+- ✅ Aplicação Streamlit rodando localmente (v0.8.0)
+- ✅ Limpeza de cache executada (__pycache__, .pytest_cache removidos)
+- ✅ **Ambas branches sincronizadas:**
+  - Branch dev: eb69c13 (atualizada no GitHub)
+  - Branch main: c8b4220 (atualizada no GitHub)
+- ✅ Streamlit Cloud em deploy automático
 
-**Resumo da Sessão (12/01/2026):**
+**Resumo da Sessão Completa (12/01/2026):**
 
 **1. Correção do Filtro de Notebooks (v0.7.0 → v0.7.1):**
-- ✅ **Problema identificado:** Filtro muito restritivo excluía registros com Model vazio (932 → 62 notebooks)
-- ✅ **Solução v0.7.0:** Lógica mais inclusiva (Model vazio agora é incluído)
-- ✅ **Solução v0.7.1:** 
-  - Padrões de OS expandidos (microsoft, win 10, win 11, etc)
-  - Filtro adicional por coluna Type (notebook|laptop|portable)
-  - Lógica OR: passa se (OS válido OU Type válido)
-- ✅ Debug logging detalhado em cada etapa do filtro
+- ✅ Filtro inclusivo para registros com Model vazio
+- ✅ Padrões de OS expandidos (microsoft, win 10, win 11)
+- ✅ Filtro adicional por coluna Type (notebook|laptop|portable)
+- ✅ Debug logging detalhado
 
 **2. Adição de Estado 'Sold' (v0.7.2):**
 - ✅ Estado "sold" (vendido) 💰 adicionado
 - ✅ Tratado como OK (não requer ajuste)
-- ✅ Mapeamento PT-BR: "vendido" → "sold"
-- ✅ Interface atualizada
 
 **3. Inventário por Modelo (v0.8.0):**
-- ✅ Nova seção na aba Relatórios
-- ✅ Tabela pivotada: Model x Estado
-- ✅ Mostra quantidade de cada modelo em cada estado (stock, broken, stolen, etc)
+- ✅ Tabela pivotada Model x Estado na aba Relatórios
 - ✅ Gráfico de barras com top 10 modelos
-- ✅ Linha TOTAL para agregação
 
-**Arquivos Modificados:**
-- `app/services/excel_handler.py` - Filtros corrigidos e melhorados
-- `app/utils/constants.py` - Padrões OS expandidos + estado sold
-- `app/components/upload_component.py` - Mensagens informativas
-- `app/components/report_component.py` - Inventário por modelo
-- `app/services/comparator.py` - Suporte a sold
-- `app/main.py` - Versões atualizadas (0.7.0 → 0.8.0)
-- `docs/historico.md` - Documentação completa
+**4. Limpeza e Deploy Final:**
+- ✅ Removidos __pycache__ e .pytest_cache
+- ✅ Merge dev → main executado
+- ✅ Push para ambas branches (dev e main)
+- ✅ P3-009 adicionada ao backlog (standby)
 
-**Próximos Passos Recomendados:**
-1. **Validar filtros** - Fazer upload da base e confirmar que todos os notebooks aparecem
-2. **Testar inventário** - Verificar visualização na aba Relatórios
-3. **Deploy** - Quando pronto, fazer commit e push para produção
+**Commits Finais:**
+- dev: `eb69c13` - "Add P3-009 to backlog (standby)"
+- main: `c8b4220` - Merge dev (v0.8.0 completo)
 
-**Tarefas do Backlog:**
-- ✅ **P1 (Crítico):** 5/5 tarefas concluídas (100%)
-- ✅ **P2 (Importante):** 4/4 tarefas concluídas (100%)
-- ✅ **P3 (Desejável):** 3/7 tarefas concluídas (42.8%)
-- 🟡 **Próxima Tarefa Sugerida:** P3-007 (SharePoint Integration)
+**Arquivos Modificados (sessão completa):**
+- Código: 7 arquivos (excel_handler, constants, comparator, upload, report, main)
+- Documentação: 5 arquivos (historico, config, aprendizado, backlog, sessão)
 
-**Versão em Desenvolvimento:** v0.8.0
-**Versão em Produção:** v0.6.3
+**Próximos Passos:**
+1. ✅ Aguardar deploy Streamlit Cloud (~2-3 min)
+2. Validar filtros e inventário em produção
+3. Futuramente: implementar P3-009 ou P3-007
+
+**Backlog Atualizado:**
+- ✅ **P1 (Crítico):** 5/5 (100%)
+- ✅ **P2 (Importante):** 4/4 (100%)
+- 🟡 **P3 (Desejável):** 3/8 (37.5%)
+  - P3-009: Em standby (persistência base)
+  - P3-007: Aguardando Azure AD (SharePoint)
+
+**Versão em Produção:** v0.8.0 (main)
+**Versão em Desenvolvimento:** v0.8.0 (dev)
+**URL Produção:** https://check-stock.streamlit.app/
 
 ---
 

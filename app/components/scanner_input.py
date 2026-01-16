@@ -22,20 +22,24 @@ def show_not_found_dialog(serial):
     col1, col2 = st.columns(2)
     
     with col1:
-        if st.button("🗑️ Remover do Registro", use_container_width=True, type="primary"):
+        if st.button("🗑️ Remover do Registro", use_container_width=True, type="primary", key="btn_remove"):
             # Remove última entrada (que foi a não encontrada)
             if st.session_state.scanned_items:
                 st.session_state.scanned_items.pop(0)
                 st.session_state.last_scan_result = st.session_state.scanned_items[0] if st.session_state.scanned_items else None
             st.session_state.blocked_scan = False
+            st.session_state.blocked_serial = None
             st.session_state.scanner_input = ""
+            st.session_state.force_verification_tab = True  # Força voltar para aba Verificação
             st.toast("✅ Registro removido com sucesso!", icon="✅")
             st.rerun()
     
     with col2:
-        if st.button("✅ Manter e Continuar", use_container_width=True):
+        if st.button("✅ Manter e Continuar", use_container_width=True, key="btn_keep"):
             st.session_state.blocked_scan = False
+            st.session_state.blocked_serial = None
             st.session_state.scanner_input = ""
+            st.session_state.force_verification_tab = True  # Força voltar para aba Verificação
             st.toast("ℹ️ Registro mantido. Continue a verificação.", icon="ℹ️")
             st.rerun()
 
