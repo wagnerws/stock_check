@@ -194,17 +194,21 @@ def render_session_metrics():
 
 def render_comparison_component():
     """
-    Renderiza componente de comparação de dados.
+    Renderiza componente de comparação de dados (apenas resultado da leitura).
     """
-    # 1. Resultados em Tempo Real
+    # Resultados em Tempo Real
     if 'last_scan_result' in st.session_state and st.session_state.last_scan_result:
         st.markdown("### 🔍 Resultado da Leitura")
         render_comparison_result(st.session_state.last_scan_result)
+    else:
+        st.info("💡 Bipe um equipamento para começar.")
 
-    # 2. Histórico de Verificações
+
+def render_history_table():
+    """
+    Renderiza tabela de histórico de verificações da sessão.
+    """
     if 'scanned_items' in st.session_state and st.session_state.scanned_items:
-        st.divider()
-        
         # Header com botão de limpar
         col_head, col_btn = st.columns([0.8, 0.2])
         col_head.markdown("#### 🕒 Histórico da Sessão")
@@ -236,6 +240,4 @@ def render_comparison_component():
             },
             height=300
         )
-    else:
-        st.info("💡 Bipe um equipamento para começar.")
 

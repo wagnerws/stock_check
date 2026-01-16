@@ -83,66 +83,6 @@ def render_report_component():
                 )
 
         st.divider()
-        
-        # --- 3.5 Inventário por Modelo (NOVO) ---
-        st.markdown("#### 📦 Inventário por Modelo de Equipamento")
-        st.caption("Distribuição de estados por modelo de notebook")
-        
-        # Buscar dados da base completa com estados
-        if 'Model' in df_base.columns and 'State' in df_base.columns:
-            # Criar DataFrame com Model e State
-            inventory_df = df_base[['Model', 'State']].copy()
-            
-            # Normalizar estados (minúsculas)
-            inventory_df['State'] = inventory_df['State'].str.lower().str.strip()
-            
-            # Criar tabela pivotada: Model x State
-            pivot_table = pd.crosstab(
-                inventory_df['Model'], 
-                inventory_df['State'],
-                margins=True,
-                margins_name='TOTAL'
-            )
-            
-            # Reordenar colunas para ter os estados principais primeiro
-            desired_order = ['stock', 'active', 'broken', 'stolen', 'in repair', 'old', 'reserved', 'sold']
-            existing_cols = [col for col in desired_order if col in pivot_table.columns]
-            other_cols = [col for col in pivot_table.columns if col not in existing_cols and col != 'TOTAL']
-            final_cols = existing_cols + other_cols + (['TOTAL'] if 'TOTAL' in pivot_table.columns else [])
-            pivot_table = pivot_table[final_cols]
-            
-            # Adicionar emojis aos nomes das colunas
-            pivot_table.columns = [
-                f"{STATE_EMOJI.get(col, '')} {col.upper()}" if col != 'TOTAL' else col 
-                for col in pivot_table.columns
-            ]
-            
-            # Exibir tabela
-            st.dataframe(
-                pivot_table,
-                use_container_width=True,
-                height=400
-            )
-            
-            # Gráfico de barras empilhadas
-            st.markdown("**Visualização Gráfica**")
-            
-            # Remover linha de total para o gráfico
-            pivot_for_chart = pivot_table.drop('TOTAL', errors='ignore')
-            
-            # Limitar aos top 10 modelos (sem linha TOTAL)
-            if len(pivot_for_chart) > 10:
-                # Ordenar por total e pegar top 10
-                top_10_models = pivot_for_chart.iloc[:, :-1].sum(axis=1).nlargest(10).index
-                pivot_for_chart = pivot_for_chart.loc[top_10_models]
-                st.caption("ℹ️ Mostrando top 10 modelos com mais equipamentos")
-            
-            st.bar_chart(pivot_for_chart, stack=False)
-            
-        else:
-            st.info("ℹ️ Colunas 'Model' e 'State' não encontradas na base de dados.")
-    
-        st.divider()
 
     # --- 4. Área de Exportação (Mantida e Melhorada) ---
     st.markdown("#### 📥 Exportação de Dados")
