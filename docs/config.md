@@ -222,53 +222,62 @@ Sessão de manutenção com execução do comando "save" para fechamento de sess
 
 ## 🔄 Resume Point
 
-**Status Atual:** 🎉 Versão 0.8.0 - Produção Atualizada
+**Status Atual:** 🎉 Versão 0.8.1 - Produção Atualizada e Refinada
 
-**Última Sessão (12/01/2026 23:40 BRT):**
-Sessão completa: correção de filtros, novas funcionalidades, limpeza e deploy.
+**Última Sessão (16/01/2026 21:14 BRT):**
+Sessão completa: melhorias massivas de UI, correções de filtros, reorganização de layout, remoção de código desnecessário e deploy.
 
 **Estado da Aplicação:**
-- ✅ Aplicação Streamlit rodando localmente (v0.8.0)
-- ✅ Limpeza de cache executada (__pycache__, .pytest_cache removidos)
+- ✅ Aplicação Streamlit rodando localmente (v0.8.1)
 - ✅ **Ambas branches sincronizadas:**
-  - Branch dev: eb69c13 (atualizada no GitHub)
-  - Branch main: c8b4220 (atualizada no GitHub)
-- ✅ Streamlit Cloud em deploy automático
+  - Branch dev: 48b2d86 (atualizada no GitHub)
+  - Branch main: eda4c31 (atualizada no GitHub + hotfix)
+- ✅ Streamlit Cloud deploy concluído com sucesso
+- ✅ **URL Produção:** https://check-stock.streamlit.app/
 
-**Resumo da Sessão Completa (12/01/2026):**
+**Resumo da Sessão (16/01/2026):**
 
-**1. Correção do Filtro de Notebooks (v0.7.0 → v0.7.1):**
-- ✅ Filtro inclusivo para registros com Model vazio
-- ✅ Padrões de OS expandidos (microsoft, win 10, win 11)
-- ✅ Filtro adicional por coluna Type (notebook|laptop|portable)
-- ✅ Debug logging detalhado
+**1. Correções de Filtros:**
+- ✅ OptiPlex incluído em `NOTEBOOK_MODEL_PATTERNS`
+- ✅ "not scanned" adicionado a `VALID_OS_PATTERNS`
+- ✅ Seriais OptiPlex 7040 agora são encontrados
+- ✅ Equipamentos não escaneados incluídos
 
-**2. Adição de Estado 'Sold' (v0.7.2):**
-- ✅ Estado "sold" (vendido) 💰 adicionado
-- ✅ Tratado como OK (não requer ajuste)
+**2. Limpeza de Código:**
+- ✅ Removida aba "Diagnóstico" completa
+- ✅ Deletado `diagnostics_component.py`
+- ✅ Removidos gráficos de inventário por modelo
+- ✅ Limpado código de `filtered_out_records`
 
-**3. Inventário por Modelo (v0.8.0):**
-- ✅ Tabela pivotada Model x Estado na aba Relatórios
-- ✅ Gráfico de barras com top 10 modelos
+**3. Reorganização de Layout:**
+- ✅ Aba Verificação reorganizada (Resultado → Scanner → Histórico → Métricas)
+- ✅ Criada função `render_history_table()` separada
+- ✅ Interface mais intuitiva e focada
 
-**4. Limpeza e Deploy Final:**
-- ✅ Removidos __pycache__ e .pytest_cache
-- ✅ Merge dev → main executado
-- ✅ Push para ambas branches (dev e main)
-- ✅ P3-009 adicionada ao backlog (standby)
+**4. Correção Crítica de Navegação:**
+- ✅ Substituído `st.tabs()` por `st.radio()` controlável
+- ✅ Implementada flag `force_verification_tab`
+- ✅ Usuário permanece na aba Verificação após modal
+
+**5. Deploy:**
+- ✅ Commit principal: `48b2d86`
+- ✅ Merge dev → main: `b39be9f`
+- ✅ Hotfix deploy: `eda4c31` (commit vazio para forçar rebuild)
 
 **Commits Finais:**
-- dev: `eb69c13` - "Add P3-009 to backlog (standby)"
-- main: `c8b4220` - Merge dev (v0.8.0 completo)
+- dev: `48b2d86` - "feat: major UI improvements and filter fixes"
+- main: `eda4c31` - "chore: force Streamlit Cloud redeploy"
 
 **Arquivos Modificados (sessão completa):**
-- Código: 7 arquivos (excel_handler, constants, comparator, upload, report, main)
-- Documentação: 5 arquivos (historico, config, aprendizado, backlog, sessão)
+- Código: 8 arquivos (constants, excel_handler, report, comparison, scanner, main)
+- Deletados: 1 arquivo (diagnostics_component.py)
+- Documentação: historico.md, aprendizado.md, config.md
 
 **Próximos Passos:**
-1. ✅ Aguardar deploy Streamlit Cloud (~2-3 min)
-2. Validar filtros e inventário em produção
-3. Futuramente: implementar P3-009 ou P3-007
+1. Validar filtros em produção com dados reais
+2. Testar com leitor Zebra DS22
+3. Coletar feedback dos usuários finais
+4. Futuro: Implementar P3-007 (SharePoint) ou P3-009 (Persistência)
 
 **Backlog Atualizado:**
 - ✅ **P1 (Crítico):** 5/5 (100%)
@@ -277,13 +286,13 @@ Sessão completa: correção de filtros, novas funcionalidades, limpeza e deploy
   - P3-009: Em standby (persistência base)
   - P3-007: Aguardando Azure AD (SharePoint)
 
-**Versão em Produção:** v0.8.0 (main)
-**Versão em Desenvolvimento:** v0.8.0 (dev)
+**Versão em Produção:** v0.8.1 (main)
+**Versão em Desenvolvimento:** v0.8.1 (dev)
 **URL Produção:** https://check-stock.streamlit.app/
 
 ---
 
-## 📚 Lessons Learned
+**Última Atualização:** 2026-01-16 21:14 BRT
 
 ### Boas Práticas
 - Usar `st.session_state` para manter dados entre interações

@@ -1,5 +1,100 @@
 # Aprendizados do Projeto - Stock Check
 
+## Data: 16/01/2026
+
+### Controle de Abas no Streamlit
+
+**Lição:** `st.tabs()` não permite controle programático da aba ativa.
+
+**Contexto:**
+- Modal de "Serial Não Encontrado" fazia `st.rerun()` após ação do usuário
+- Após rerun, aplicação voltava sempre para primeira aba (Upload)
+- Usuário precisava clicar manualmente na aba Verificação
+
+**Problema:**
+```python
+# st.tabs() não tem parâmetro para selecionar aba ativa
+tab1, tab2, tab3 = st.tabs(["Upload", "Verificação", "Relatórios"])
+# Não há como fazer: st.tabs(..., active_tab=1)
+```
+
+**Solução:**
+Substituir `st.tabs()` por `st.radio()` horizontal com session_state:
+
+```python
+# Inicializar aba ativa
+if 'active_tab' not in st.session_state:
+    st.session_state.active_tab = "📤 Upload"
+
+# Flag para forçar aba específica
+if st.session_state.get('force_verification_tab', False):
+    st.session_state.active_tab = "🔍 Verificação"
+    st.session_state.force_verification_tab = False
+
+# Seletor de abas controlável
+selected_tab = st.radio(
+    "Navegação",
+    ["📤 Upload", "🔍 Verificação", "📊 Relatórios", "📜 Histórico"],
+    index=options.index(st.session_state.active_tab),
+    horizontal=True,
+    label_visibility="collapsed"
+)
+
+# Renderizar baseado na seleção
+if selected_tab == "📤 Upload":
+    render_upload()
+elif selected_tab == "🔍 Verificação":
+    render_verification()
+```
+
+**Benefícios:**
+- ✅ Controle programático completo
+- ✅ Visual praticamente idêntico a tabs
+- ✅ Persistência entre reruns via session_state
+- ✅ Permite forçar mudança de aba via código
+
+**Aprendizado:**
+- Para interfaces que requerem controle programático, usar `st.radio()` horizontal
+- `st.tabs()` é bom para UI estática sem necessidade de controle
+- Session_state é essencial para manter estado entre reruns
+
+---
+
+### Deploy e Cache no Streamlit Cloud
+
+**Lição:** Streamlit Cloud pode manter cache mesmo após push correto.
+
+**Problema Encontrado:**
+- Código correto presente no GitHub (origin/main)
+- Função `render_history_table()` existia no repositório
+- Streamlit Cloud reportava `ImportError: cannot import render_history_table`
+- Verificação manual: `git show origin/main:arquivo.py` confirmou presença da função
+
+**Causa:**
+- Cache agressivo do Streamlit Cloud
+- Build anterior pode ser mantido mesmo com novo commit
+
+**Solução:**
+```bash
+# Forçar redeploy com commit vazio
+git commit --allow-empty -m "chore: force Streamlit Cloud redeploy"
+git push origin main
+```
+
+**Verificação:**
+```bash
+# Sempre verificar código no remote antes de culpar cache
+git show origin/main:app/components/comparison_component.py | grep "render_history_table"
+```
+
+**Aprendizado:**
+1. Sempre verificar que código está realmente no remoto
+2. Commit vazio é válido para forçar rebuild
+3. Streamlit Cloud pode levar 2-3 minutos para detectar mudanças
+4. No caso de ImportError inesperado, verificar logs do Streamlit Cloud
+
+---
+
 ## Data: 12/01/2026
 
 ### Filtros de Dados com Pandas

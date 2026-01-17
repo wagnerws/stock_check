@@ -1,5 +1,105 @@
 # Histórico de Configuração do Projeto
 
+## Data: 16/01/2026 - 21:14 BRT
+
+### 26. Melhorias Massivas de UI e Correções de Filtros (v0.8.1)
+
+#### Contexto
+Sessão completa focada em refinamentos de UX, correção de filtros, reorganização de layout e deploy bem-sucedido.
+
+#### Alterações Implementadas
+
+**1. Correção de Filtros de Notebooks:**
+- ✅ Adicionado "OptiPlex" aos modelos válidos (`NOTEBOOK_MODEL_PATTERNS`)
+- ✅ Removido "OptiPlex" da lista de exclusão (`EXCLUDE_MODEL_PATTERNS`)
+- ✅ Adicionado "not scanned" aos sistemas operacionais válidos
+- **Resultado:** Seriais OptiPlex 7040 e equipamentos não escaneados agora são encontrados
+
+**2. Remoção de Funcionalidades Desnecessárias:**
+- ✅ Removida aba "Diagnóstico" e todo código relacionado
+- ✅ Removida função `diagnostics_component.py` (deletado)
+- ✅ Removido gráfico de visualização de inventário por modelo
+- ✅ Limpado código de salvamento de `filtered_out_records` em session_state
+
+**3. Reorganização de Layout da Aba Verificação:**
+- Nova ordem (de cima para baixo):
+  1. 🔍 **Resultado da Leitura** (no topo para visualização imediata)
+  2. 📱 **Scanner de Equipamentos** (campo de input)
+  3. 🕒 **Histórico da Sessão** (tabela)
+  4. 📊 **Métricas da Sessão** (estatísticas)
+- Criada função `render_history_table()` separada para melhor organização
+
+**4. Correção Crítica: Navegação entre Abas:**
+- **Problema:** Após clicar em "Remover do Registro" ou "Manter e Continuar" no modal de serial não encontrado, aplicação voltava para aba Upload
+- **Solução:** Substituído `st.tabs()` por `st.radio()` controlável via `session_state`
+- **Implementação:**
+  ```python
+  # Flag setada no modal
+  st.session_state.force_verification_tab = True
+  
+  # Detectada e aplicada no main.py
+  if st.session_state.get('force_verification_tab', False):
+      st.session_state.active_tab = "🔍 Verificação"
+  ```
+- **Resultado:** Usuário permanece na aba Verificação após resolver modal
+
+**5. Deploy e Correções:**
+- ✅ Commit inicial: `48b2d86` - "feat: major UI improvements and filter fixes"
+- ✅ Push para dev e merge para main
+- ⚠️ **Bug de Deploy:** ImportError no Streamlit Cloud (função `render_history_table` não  foi incluída no commit)
+- ✅ **Correção:** Commit vazio forçado (`eda4c31`) para trigger redeploy
+- ✅ Deploy bem-sucedido após correção
+
+#### Arquivos Modificados
+- `app/utils/constants.py` - Filtros atualizados (OptiPlex, not scanned)
+- `app/components/report_component.py` - Removido gráfico de visualização
+- `app/components/comparison_component.py` - Separada função `render_history_table()`
+- `app/components/scanner_input.py` - Adicionada flag `force_verification_tab`
+- `app/main.py` - Substituído tabs por radio, reorganizado layout
+- `app/services/excel_handler.py` - Removido código de diagnóstico
+- `app/components/diagnostics_component.py` - **DELETADO**
+
+#### Commits Git
+```bash
+# Branch dev
+48b2d86 - feat: major UI improvements and filter fixes
+- 8 arquivos modificados
+- 153 inserções (+), 134 deleções (-)
+
+# Branch main  
+b39be9f - Merge dev into main
+eda4c31 - chore: force Streamlit Cloud redeploy (correção)
+```
+
+#### Métricas da Sessão
+- **Duração:** ~3h 
+- **Arquivos modificados:** 8
+- **Arquivos deletados:** 1
+- **Linhas adicionadas:** 153
+- **Linhas removidas:** 134
+- **Commits:** 3 (dev + merge + hotfix)
+- **Deploy:** Bem-sucedido após correção
+
+#### Aprendizados
+1. **Streamlit Cloud Cache:** Às vezes requer commit vazio para forçar redeploy
+2. **Tabs Não-Controláveis:** `st.tabs()` não permite controle programático da aba ativa
+3. **Solução para Controle de Abas:** Usar `st.radio()` horizontal como alternativa
+4. **Verificar Commits:** Sempre validar que todas mudanças foram commitadas antes de push
+
+#### Estado Final
+- ✅ **Versão em Produção:** v0.8.1
+- ✅ **Filtros Funcionando:** OptiPlex e "not scanned" incluídos
+- ✅ **Interface Limpa:** Removidas funcionalidades desnecessárias  
+- ✅ **Navegação Corrigida:** Permanece em aba Verificação após modal
+- ✅ **Deploy Estável:** Streamlit Cloud atualizado e funcional
+
+#### Próximos Passos
+1. Validar funcionamento em produção
+2. Testar com leitor Zebra DS22 real  
+3. Coletar feedback dos usuários finais
+
+---
+
 ## Data: 12/01/2026 - 19:20 BRT
 
 ### 25. Correção do Filtro de OS e Adição de Filtro Type (v0.7.1)
