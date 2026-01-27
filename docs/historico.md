@@ -1,5 +1,113 @@
 # Histórico de Configuração do Projeto
 
+# Histórico de Configuração do Projeto
+
+## Data: 27/01/2026 - 15:55 BRT
+
+### 30. Simplificação de Interface e Métricas de Conciliação (v0.8.5)
+
+#### Contexto
+Após feedbacks de uso, a interface foi simplificada para remover distrações (cabeçalhos redundantes, gráficos de análise) e focar na tarefa principal. Adicionalmente, foi esclarecida a métrica de conciliação para itens que não pertencem ao estoque (ex: Reservado).
+
+#### Alterações Implementadas
+- **UI Limpa**:
+    - Removidos títulos `st.title` repetitivos e labels de menu.
+    - Ocultadas seções de "Progresso Geral" e "Análise da Sessão" do relatório.
+    - Seção de "Exportação" movida para o rodapé da página.
+- **Conciliação**:
+    - Adicionada métrica **"Outros Bipados"** para itens encontrados que não são 'Stock'.
+    - Lógica de conciliação mantida (considera apenas 'Stock' para falta), mas agora o usuário entende onde foram parar os outros itens.
+
+#### Arquivos Modificados
+- `app/main.py`
+- `app/components/report_component.py`
+- `app/services/reconciliation.py`
+
+---
+
+## Data: 27/01/2026 - 14:15 BRT
+
+### 29. Refatoração de UI: Navegação Lateral (v0.8.4)
+
+#### Contexto
+Melhoria de UX solicitada para organizar a navegação. O menu de abas foi movido para a sidebar, permitindo uma área de trabalho mais limpa e foco no conteúdo principal.
+
+#### Alterações Implementadas
+- **Sidebar Renovada**:
+    - Menu de navegação (Radio Button) movido para o topo lateral.
+    - Status de carregamento e contagem de itens logo abaixo.
+    - Legenda de estados agora em um `expander` para economizar espaço.
+- **Main Content**:
+    - Removida barra de navegação superior.
+    - Adicionado cabeçalho dinâmico indicando o módulo ativo.
+
+#### Arquivos Modificados
+- `app/main.py`
+
+---
+
+## Data: 27/01/2026 - 14:05 BRT
+
+### 28. Refatoração: Remoção de Suporte Específico RJ (v0.8.3)
+
+#### Contexto
+Por solicitação do usuário, a distinção de "Estoque RJ" foi removida. O sistema agora considera apenas o estado "stock" para conciliação, simplificando a regra de negócio.
+
+#### Alterações Implementadas
+- **Reversão de Constantes**: Removido `stock rj` de `VALID_STATES` e `OK_STATES`.
+- **Simplificação de Conciliação**: `reconciliation.py` agora foca apenas em itens faltantes do estoque geral.
+- **Interface Limpa**: Removidas abas de separação SP/RJ em `report_component.py`.
+- **Relatórios**: PDF agora gera apenas lista única de divergências.
+
+#### Arquivos Modificados
+- `app/utils/constants.py`
+- `app/services/reconciliation.py`
+- `app/components/report_component.py`
+- `app/services/pdf_generator.py`
+
+---
+
+## Data: 27/01/2026 - 13:50 BRT
+
+### 27. Conciliação de Estoque e Relatórios PDF (v0.8.2)
+
+#### Contexto
+Implementada funcionalidade crítica para auditoria de estoque: identificar não apenas o que foi verificado, mas **o que faltou verificar** (divergências). Também adicionado suporte oficial para segregação de "Estoque RJ".
+
+#### Alterações Implementadas
+
+**1. Módulo de Reconciliação (`app/services/reconciliation.py`):**
+- Identifica itens marcados como `stock` na base que não foram bipados na sessão
+- Segrega itens `stock rj` (que não devem ser bipados localmente)
+- Calcula métricas de divergência
+
+**2. Relatórios de Conciliação em PDF:**
+- Novo relatório gerado via `reportlab`
+- Lista itens faltantes com detalhes (Serial, Modelo, Usuário)
+- Anexo separado para itens do RJ
+
+**3. Frontend (`app/components/report_component.py`):**
+- Nova seção "Conciliação de Estoque"
+- Tabs separadas para Faltantes e RJ
+- Botões de exportação (Excel e PDF)
+
+**4. Suporte a Estoque RJ:**
+- Adicionado estado `stock rj` e emoji 🏖️
+- Configurado como estado válido (não pede ajuste)
+
+#### Arquivos Modificados
+- `app/utils/constants.py` - Novo estado `stock rj`
+- `app/services/reconciliation.py` - **NOVO**
+- `app/services/pdf_generator.py` - Nova função `generate_conciliation_pdf`
+- `app/components/report_component.py` - UI atualizada
+- `app/services/comparator.py` - Ajuste de lógica de validação
+
+#### Próximos Passos
+1. Validar fluxo completo com base real contendo itens RJ
+2. Verificar se alertas de "Faltantes" estão claros para o usuário
+
+---
+
 ## Data: 16/01/2026 - 21:14 BRT
 
 ### 26. Melhorias Massivas de UI e Correções de Filtros (v0.8.1)

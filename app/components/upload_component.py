@@ -23,7 +23,7 @@ def render_upload_component() -> Optional[pd.DataFrame]:
     Returns:
         DataFrame carregado ou None se nenhum arquivo válido
     """
-    st.subheader("📥 Upload da Base Lansweeper")
+    st.markdown("## 📥 Upload da Base Lansweeper")
     st.markdown(
         """
         Faça upload do arquivo Excel exportado do **Lansweeper** contendo os dados dos equipamentos.

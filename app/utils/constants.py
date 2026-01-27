@@ -3,15 +3,15 @@ Constantes do domínio de negócio.
 """
 
 # Estados válidos de equipamentos no sistema
+# Estados válidos de equipamentos no sistema
 VALID_STATES = {
-    'stock': '✅ Em estoque - OK',
-    'broken': '🔧 Quebrado - OK',
-    'stolen': '🚨 Roubado - OK',
-    'in repair': '⚙️ Em reparo - OK',
-    'old': '📦 Equipamento antigo - OK',
-    'reserved': '🔖 Reservado - OK',
-    'sold': '💰 Vendido - OK',
-    'active': '⚠️ ATIVO - Requer ajuste no Lansweeper'
+    'stock': '✅ Stock',
+    'broken': '🔧 Broken',
+    'stolen': '🚨 Stolen',
+    'in repair': '⚙️ In Repair',
+    'old': '📦 Old',
+    'reservado': '🏷️ Reservado',
+    'active': '⚠️ Active'
 }
 
 # Mapa de Emojis para visualização
@@ -21,17 +21,16 @@ STATE_EMOJI = {
     'stolen': '🚨',
     'in repair': '⚙️',
     'old': '📦',
-    'reserved': '🔖',
-    'sold': '💰',
+    'reservado': '🏷️',
     'active': '⚠️'
 }
 
 # Lista de estados que NÃO requerem ajuste manual
-OK_STATES = ['stock', 'broken', 'stolen', 'in repair', 'old', 'reserved', 'sold']
+OK_STATES = ['stock', 'broken', 'stolen', 'in repair', 'old', 'reservado']
 
 # Estado que requer ajuste no Lansweeper
 REQUIRES_ADJUSTMENT_STATE = 'active'
-
+    
 # Extensões de arquivo permitidas
 ALLOWED_EXTENSIONS = ['.xlsx', '.xls']
 
@@ -53,8 +52,7 @@ STATE_NORMALIZATION = {
     'roubado': 'stolen',
     'em reparo': 'in repair',
     'antigo': 'old',
-    'reservado': 'reserved',
-    'vendido': 'sold',
+    'reservado': 'reservado',
     'ativo': 'active',
     # Inglês → Inglês (idempotência)
     'stock': 'stock',
@@ -62,8 +60,7 @@ STATE_NORMALIZATION = {
     'stolen': 'stolen',
     'in repair': 'in repair',
     'old': 'old',
-    'reserved': 'reserved',
-    'sold': 'sold',
+    'reservado': 'reservado',
     'active': 'active'
 }
 

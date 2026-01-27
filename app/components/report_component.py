@@ -10,7 +10,7 @@ def render_report_component():
     Renderiza o componente de relatórios com dashboard analítico e exportação.
     Inclui métricas de progresso, gráficos de distribuição e botões de download.
     """
-    st.markdown("### 📊 Dashboard de Relatórios")
+    st.markdown("## 📊 Dashboard de Relatórios")
     
     # --- 1. Dados e Verificações Iniciais ---
     if 'dataframe' not in st.session_state or st.session_state.dataframe is None:
@@ -27,64 +27,137 @@ def render_report_component():
     items_adjustment = get_adjustment_items(scanned_items)
     count_adjustment = len(items_adjustment)
     
-    # --- 2. Métricas de Progresso (Topo) ---
-    st.markdown("#### 📈 Progresso Geral")
+    # --- 2. Métricas de Progresso e Análise REMOVIDOS ---
+    # Motivo: Solicitação do usuário para simplificar a interface.
     
-    # Barra de progresso visual
-    st.progress(progress_pct, text=f"Progresso da Sessão: {progress_pct:.1%}")
+    st.divider()
+
+    # --- 4. Área de Exportação (Mantida e Melhorada) ---
+    # --- 4. Área de Exportação movida para o final ---
+
+    # --- 5. Conciliação de Estoque ---
+    st.markdown("#### 📦 Conciliação de Estoque")
     
-    m1, m2, m3, m4 = st.columns(4)
-    with m1:
-        st.metric("Total na Base", total_base)
-    with m2:
-        st.metric("Verificados", f"{total_scanned}", f"{progress_pct:.1%}")
-    with m3:
-        st.metric("Pendentes", pendentes, delta_color="off")
-    with m4:
-        st.metric("Requerem Ajuste", count_adjustment, delta_color="inverse")
+    # Calculate reconciliation metrics
+    from app.services.reconciliation import get_missing_items, get_stock_metrics
+    
+    scanned_serials = [item['serialnumber'] for item in scanned_items]
+    missing_stock = get_missing_items(df_base, scanned_serials)
+    metrics = get_stock_metrics(df_base, scanned_items)
+    
+    # Display metrics
+    rec_col1, rec_col2, rec_col3, rec_col4 = st.columns(4)
+    
+    with rec_col1:
+        st.metric("Esperado (Estoque)", metrics['total_expected'])
+    with rec_col2:
+        st.metric("Bipados (Estoque)", metrics['total_scanned_stock'])
+    with rec_col3:
+        st.metric("Outros Bipados", metrics.get('total_scanned_others', 0), help="Itens encontrados mas com estado diferente de 'Stock'")
+    with rec_col4:
+        st.metric("❌ Faltantes", metrics['total_missing'], delta_color="inverse")
+    
+    st.divider()
+    
+    # Detalhamento Completo por Estado
+    from app.services.reconciliation import calculate_full_reconciliation
+    
+    st.markdown("##### 📋 Detalhamento por Estado")
+    
+    df_reconciliation = calculate_full_reconciliation(df_base, scanned_items)
+    
+    if not df_reconciliation.empty:
+        # Adicionar emojis
+        df_reconciliation['Estado'] = df_reconciliation['Estado'].apply(
+            lambda x: f"{STATE_EMOJI.get(x.lower(), '❓')} {x.title()}"
+        )
+        
+        st.dataframe(
+            df_reconciliation,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Estado": st.column_config.TextColumn("Estado", width="medium"),
+                "Esperado (Base)": st.column_config.NumberColumn("Esperado (Base)", format="%d"),
+                "Encontrado (Físico)": st.column_config.NumberColumn("Encontrado (Físico)", format="%d"),
+                "Divergência": st.column_config.NumberColumn("Divergência", format="%d", help="Positivo: Falta item físico | Negativo: Item extra")
+            }
+        )
+    else:
+        st.info("Sem dados para conciliação.")
+
+    st.divider()
+    
+    # Display missing items (Stock only warning)
+    if not missing_stock.empty:
+        st.warning(f"⚠️ **{len(missing_stock)} item(ns)** marcado(s) como 'Estoque' não foi(ram) bipado(s):")
+        
+        st.dataframe(
+            missing_stock,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Serialnumber": st.column_config.TextColumn("Serial", width="medium"),
+                "State": st.column_config.TextColumn("Estado", width="small"),
+                "Model": st.column_config.TextColumn("Modelo", width="medium"),
+                "Name": st.column_config.TextColumn("Hostname", width="medium"),
+                "lastuser": st.column_config.TextColumn("Último Usuário", width="medium")
+            }
+        )
+        
+        # Export missing items
+        from app.services.excel_handler import export_excel
+        from app.services.pdf_generator import generate_conciliation_pdf
+        from io import BytesIO
+        import openpyxl
+        
+        # Excel Button
+        output = BytesIO()
+        missing_stock.to_excel(output, index=False, engine='openpyxl')
+        output.seek(0)
+        
+        col_btn_excel, col_btn_pdf = st.columns(2)
+        
+        with col_btn_excel:
+            st.download_button(
+                label="📥 Excel (.xlsx)",
+                data=output.getvalue(),
+                file_name=f"faltantes_estoque_{datetime.now().strftime('%Y%m%d')}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                key="btn_missing_stock_xlsx",
+                use_container_width=True,
+            )
+        
+        # PDF Button
+        with col_btn_pdf:
+            try:
+                session_data = {
+                    'session_id': st.session_state.get('session_id', 'current'),
+                    'timestamp': datetime.now()
+                }
+                
+                pdf_bytes = generate_conciliation_pdf(
+                    session_data=session_data,
+                    missing_stock=missing_stock
+                )
+                
+                st.download_button(
+                    label="📄 Relatório PDF",
+                    data=pdf_bytes,
+                    file_name=f"relatorio_conciliacao_{datetime.now().strftime('%Y%m%d')}.pdf",
+                    mime="application/pdf",
+                    key="btn_missing_stock_pdf",
+                    use_container_width=True,
+                    type="primary"
+                )
+            except Exception as e:
+                st.error(f"Erro PDF: {e}")
+    else:
+        st.success("✅ Todos os itens de estoque conferem com o sistema!")
 
     st.divider()
 
-    # --- 3. Análise da Sessão (Gráficos) ---
-    if total_scanned > 0:
-        st.markdown("#### 🔎 Análise da Sessão")
-        
-        c_chart, c_stats = st.columns([2, 1])
-        
-        with c_chart:
-            st.markdown("**Distribuição por Estado (Itens Verificados)**")
-            
-            # Preparar dados para o gráfico
-            df_scanned = pd.DataFrame(scanned_items)
-            
-            if 'state' in df_scanned.columns:
-                # Contagem por estado
-                state_counts = df_scanned['state'].value_counts()
-                st.bar_chart(state_counts, color="#0068c9")
-            else:
-                st.info("Sem dados de estado para exibir gráfico.")
-
-        with c_stats:
-            st.markdown("**Detalhamento**")
-            # Tabela resumida de contagem
-            if 'state' in df_scanned.columns:
-                summary_df = df_scanned['state'].value_counts().reset_index()
-                summary_df.columns = ['Estado', 'Qtd']
-                
-                # Adicionar emojis se possível
-                summary_df['Estado'] = summary_df['Estado'].apply(
-                    lambda x: f"{STATE_EMOJI.get(x.lower(), '❓')} {x}"
-                )
-                
-                st.dataframe(
-                    summary_df, 
-                    use_container_width=True, 
-                    hide_index=True
-                )
-
-        st.divider()
-
-    # --- 4. Área de Exportação (Mantida e Melhorada) ---
+    # --- 5. Área de Exportação (Final da Página) ---
     st.markdown("#### 📥 Exportação de Dados")
     
     if total_scanned == 0:
@@ -131,3 +204,4 @@ def render_report_component():
                 key="btn_rep_full",
                 use_container_width=True
             )
+
