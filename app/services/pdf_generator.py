@@ -334,3 +334,134 @@ def generate_historical_session_pdf(session_file_data: dict) -> bytes:
         dataframe=pd.DataFrame(),
         format_type="complete"
     )
+
+
+def generate_conciliation_pdf(
+    session_data: dict,
+    missing_stock: pd.DataFrame
+) -> bytes:
+    """
+    Gera relatório PDF de conciliação (itens faltantes).
+    
+    Args:
+        session_data: Dados da sessão
+        missing_stock: DataFrame de itens faltantes do estoque local
+        
+    Returns:
+        Bytes do PDF gerado
+    """
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=2*cm,
+        leftMargin=2*cm,
+        topMargin=2*cm,
+        bottomMargin=2*cm
+    )
+    
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=18,
+        textColor=colors.HexColor('#d32f2f'),  # Vermelho alerta
+        spaceAfter=12,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold'
+    )
+    
+    heading_style = ParagraphStyle(
+        'CustomHeading',
+        parent=styles['Heading2'],
+        fontSize=14,
+        textColor=colors.HexColor('#d32f2f'),
+        spaceBefore=12,
+        spaceAfter=6,
+        fontName='Helvetica-Bold'
+    )
+    
+    subheading_style = ParagraphStyle(
+        'SubHeading',
+        parent=styles['Heading3'],
+        fontSize=12,
+        textColor=colors.HexColor('#003366'),
+        spaceBefore=10,
+        spaceAfter=5
+    )
+    
+    # Title
+    elements.append(Paragraph("RELATÓRIO DE CONCILIAÇÃO DE ESTOQUE", title_style))
+    elements.append(Spacer(1, 0.5*cm))
+    
+    # Metadata
+    session_id = session_data.get('session_id', 'N/A')
+    timestamp = session_data.get('timestamp', datetime.now(ZoneInfo("America/Sao_Paulo")))
+    timestamp_str = timestamp.strftime('%d/%m/%Y %H:%M:%S %Z')
+    
+    metadata_text = f"""
+    <b>Data da Análise:</b> {timestamp_str}<br/>
+    <b>Session ID:</b> {session_id}
+    """
+    elements.append(Paragraph(metadata_text, styles['Normal']))
+    elements.append(Spacer(1, 0.5*cm))
+    
+    # Summary of Missing Items
+    total_missing = len(missing_stock)
+    
+    elements.append(Paragraph("RESUMO DE DIVERGÊNCIAS", heading_style))
+    
+    summary_text = f"Foram identificados <b>{total_missing}</b> equipamentos marcados como 'Stock' que NÃO foram localizados durante a verificação."
+    elements.append(Paragraph(summary_text, styles['Normal']))
+        
+    elements.append(Spacer(1, 0.5*cm))
+    
+    # Table Function
+    def add_items_table(df, title):
+        if df.empty:
+            elements.append(Paragraph(f"{title}: Nenhum item.", styles['Normal']))
+            return
+
+        elements.append(Paragraph(title, subheading_style))
+        
+        # Table Header
+        data = [['Serial', 'Modelo', 'Hostname', 'Último Usuário']]
+        
+        for _, row in df.iterrows():
+            data.append([
+                str(row.get('Serialnumber', 'N/A'))[:20],
+                str(row.get('Model', 'N/A'))[:25],
+                str(row.get('Name', 'N/A'))[:20],
+                str(row.get('lastuser', 'N/A'))[:15]
+            ])
+            
+        # Create Table
+        table = Table(data, colWidths=[4.5*cm, 5*cm, 3.5*cm, 4*cm])
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#d32f2f')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ]))
+        
+        elements.append(table)
+        elements.append(Spacer(1, 0.5*cm))
+
+    # Add Tables
+    if not missing_stock.empty:
+        add_items_table(missing_stock, "❌ Itens Faltantes (Estoque)")
+        
+    # Build PDF
+    doc.build(elements)
+    
+    pdf_bytes = buffer.getvalue()
+    buffer.close()
+    
+    return pdf_bytes
