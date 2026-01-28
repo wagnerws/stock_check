@@ -313,4 +313,35 @@ Sessão completa: melhorias massivas de UI, correções de filtros, reorganizaç
 
 ---
 
-**Última Atualização:** 2026-01-12 16:37 BRT
+---
+
+## 🔄 Resume Point
+
+**Status Atual:** 🎉 Versão 0.8.6 - Conciliação Full & UI Polida
+
+**Última Sessão (27/01/2026 16:45 BRT):**
+Sessão intensiva de refinamento de regras de negócio e interface. O sistema agora não só valida o que foi bipado, mas explica detalhadamente onde estão as faltas por categoria.
+
+**Estado da Aplicação:**
+- ✅ Aplicação Streamlit rodando localmente (v0.8.6)
+- ✅ **Branches Sincronizadas (dev/main):** Codebase idêntico em ambas.
+- ✅ Deploy realizado com sucesso.
+- ✅ **URL Produção:** https://check-stock.streamlit.app/
+
+**Resumo da Funcionalidade (v0.8.6):**
+1. **Conciliação:** Tabela "Esperado vs Encontrado" para todos os status.
+2. **Filtros:** "Sold" removido; "Reservado" corrigido (pt-br).
+3. **UI:** Interface limpa, sidebar com cards, report otimizado.
+
+**Próximos Passos Recomendados:**
+1. Monitorar feedback do usuário sobre a nova tabela de conciliação.
+2. Validar se a remoção do status 'Sold' cobriu todos os cenários de borda.
+3. Futuro: Retomar P3-007 (SharePoint) quando credenciais estiverem disponíveis.
+
+**Backlog Atualizado:**
+- ✅ **P1 (Crítico):** 5/5 (100%)
+- ✅ **P2 (Importante):** 4/4 (100%)
+- 🟡 **P3 (Desejável):** Tarefas de Relatórios e Histórico concluídas. Pendente integrações complexas.
+
+**Última Atualização:** 27/01/2026 16:45 BRT
+
