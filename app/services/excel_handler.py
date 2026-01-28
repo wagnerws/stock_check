@@ -154,9 +154,11 @@ def filter_notebooks_only(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]
         
         # Combinar filtros: (Model correto) E (OS válido OU Type válido)
         # Isso significa: se tiver OS válido OU Type válido, passa
+        # Combinar filtros: ((Model correto) OU (OS válido OU Type válido)) E (Não é excluído)
+        # Isso permite que modelos desconhecidos (ex: Lenovo) passem se tiverem OS ou Type válido
         if 'OS' in df.columns or 'Type' in df.columns:
             os_or_type = has_valid_os | has_valid_type
-            final_filter = filter_include & model_exclude & os_or_type
+            final_filter = (filter_include | os_or_type) & model_exclude
         else:
             # Se não tem nem OS nem Type, usar apenas filtros de modelo
             final_filter = filter_include & model_exclude
