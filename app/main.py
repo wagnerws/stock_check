@@ -107,7 +107,7 @@ def main():
 
     # Sidebar
     st.sidebar.title("📦 Stock Check")
-    st.sidebar.caption("v0.8.6 - Full Reconciliation")
+    st.sidebar.caption("v0.9.0 - Linux Filters & Debug Tool")
     
     st.sidebar.divider()
     

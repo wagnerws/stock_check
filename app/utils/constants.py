@@ -79,6 +79,7 @@ NOTEBOOK_MODEL_PATTERNS = [
 # Padrões de modelos a EXCLUIR (VMs, equipamentos de rede, etc)
 EXCLUDE_MODEL_PATTERNS = [
     'virtual',       # Máquinas virtuais
+    'vm',            # VM
     'fortinet'       # Fortinet
 ]
 
@@ -94,6 +95,8 @@ VALID_OS_PATTERNS = [
     'macos',            # macOS
     'mac os',           # Mac OS
     'os x',             # OS X
+    'linux',            # Linux
+    'ubuntu',           # Ubuntu
     'not scanned',      # Equipamentos não escaneados pelo Lansweeper
 ]
 

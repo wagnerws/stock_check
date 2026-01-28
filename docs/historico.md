@@ -2,7 +2,44 @@
 
 # Histórico de Configuração do Projeto
 
-## Data: 27/01/2026 - 15:55 BRT
+## Data: 27/01/2026 - 16:45 BRT
+
+### 31. Deploy v0.8.6 - Release de Conciliação Completa e UI Final
+
+#### Contexto
+Sessão focada em finalizar a lógica de conciliação (detalhando itens esperados vs encontrados por status), corrigir a nomenclatura de status ("Reservado") e lançar para produção com uma interface otimizada.
+
+#### Alterações Implementadas
+
+**1. Conciliação Completa (`reconciliation.py`):**
+- Implementada tabela **"Detalhamento por Estado"**
+- Mostra para cada status (Stock, Reservado, Quebrado...):
+    - Quantidade Esperada na Base
+    - Quantidade Encontrada Fisicamente
+    - Divergência (Faltantes)
+- Adicionado **filtro de segurança**: Itens com status **'Sold'** (Vendido) são explicitamente removidos da contagem, mesmo que constem na base importada.
+
+**2. Correções de Negócio (`constants.py`):**
+- **Padronização de Status**: `reserved` alterado para `reservado` em todo o sistema.
+- **Legenda Limpa**: Removidas traduções redundantes (ex: apenas "Stock" ao invés de "Stock (Estoque)").
+- **Remoção de Status Obsoleto**: Removedor status `sold` da lista de status válidos visualizáveis.
+
+**3. Deploy para Produção:**
+- Versão atualizada para **v0.8.6** no `main.py`.
+- Código mergeado (`dev` -> `main`) e pushado para GitHub.
+
+#### Arquivos Modificados
+- `app/services/reconciliation.py` - Lógica de filtro 'sold' e tabela completa.
+- `app/utils/constants.py` - Correção `reservado` e limpeza de `sold`.
+- `app/components/report_component.py` - Nova tabela de detalhamento.
+- `app/services/comparator.py` - Ajuste de flag `reservado`.
+- `app/main.py` - Legenda atualizada, versão v0.8.6.
+
+#### Metricas da Sessão
+- **Versão Final**: v0.8.6
+- **Status Deploy**: ✅ Sucesso (Streamlit Cloud sincronizado)
+
+---
 
 ### 30. Simplificação de Interface e Métricas de Conciliação (v0.8.5)
 

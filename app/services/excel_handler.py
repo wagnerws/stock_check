@@ -15,7 +15,7 @@ from app.config import REQUIRED_COLUMNS
 from app.utils.helpers import sanitize_excel_value
 
 
-def import_excel(file_path: str) -> Optional[pd.DataFrame]:
+def import_excel(file_path: str) -> Tuple[Optional[pd.DataFrame], Optional[pd.DataFrame]]:
     """
     Importa arquivo Excel do Lansweeper e valida estrutura.
     
@@ -25,13 +25,13 @@ def import_excel(file_path: str) -> Optional[pd.DataFrame]:
         file_path: Caminho do arquivo Excel
         
     Returns:
-        DataFrame com dados importados (apenas notebooks) ou None se inválido
+        Tupla (DataFrame filtrado, DataFrame removido) ou (None, None) se erro
     """
     try:
         # Read Excel file
         df = pd.read_excel(file_path, engine='openpyxl')
         
-        print(f"\n📂 Arquivo carregado: {len(df)} registros totais")
+        print(f"\\n📂 Arquivo carregado: {len(df)} registros totais")
         
         # Validate structure
         is_valid, error_message = validate_excel_structure(df)
@@ -46,21 +46,19 @@ def import_excel(file_path: str) -> Optional[pd.DataFrame]:
             )
         
         # Filtro automático de notebooks
-        # Filtra notebooks (Dell Latitude, Dell Pro, OptiPlex, MacBook)
-        # Exclui VMs, Fortinet e outros equipamentos não-notebook
         df_notebooks, df_removed = filter_notebooks_only(df)
         
         if df_notebooks.empty:
             raise ValueError(
                 "Nenhum notebook encontrado após aplicar filtro. "
-                "Verifique se a base contém Dell Latitude, Dell Pro, OptiPlex ou MacBook."
+                "Verifique se a base contém Dell Latitude, Dell Pro, OptiPlex, MacBook ou Linux."
             )
         
-        return df_notebooks
+        return df_notebooks, df_removed
     
     except Exception as e:
         print(f"Erro ao importar Excel: {str(e)}")
-        return None
+        return None, None
 
 
 def filter_notebooks_only(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -143,14 +141,14 @@ def filter_notebooks_only(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]
         
         if 'Type' in df.columns:
             type_valid = df['Type'].fillna('').str.lower().str.contains(
-                'notebook|laptop|portable',
+                'notebook|laptop|portable|linux',
                 case=False,
                 na=False,
                 regex=True
             )
             has_valid_type = type_valid
             after_type = (filter_include & model_exclude & type_valid).sum()
-            print(f"📊 Filtro TYPE: {after_exclude} → {after_type} registros (apenas Notebook/Laptop)")
+            print(f"📊 Filtro TYPE: {after_exclude} → {after_type} registros (apenas Notebook/Laptop/Linux)")
         else:
             print(f"⚠️ Coluna 'Type' não encontrada. Pulando filtro de Type.")
         
